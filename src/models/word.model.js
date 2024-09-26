@@ -1,5 +1,14 @@
 const mongoose = require("mongoose");
 
+const reviewHistorySchema = new mongoose.Schema({
+  reviewDate: {
+    type: Date,
+  },
+  step: {
+    type: Number,
+  }
+});
+
 const wordSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -14,7 +23,7 @@ const wordSchema = new mongoose.Schema(
     reviewCount: { type: Number, default: 0 },
     step: { type: Number, default: 1 },
     nextReviewDate: { type: Date, required: true },
-    reviewHistory: { type: [Date], default: [] }, 
+    reviewHistory: { type: [reviewHistorySchema], default: [] }, 
     lessonId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Lesson",

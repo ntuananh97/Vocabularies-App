@@ -195,8 +195,69 @@ const updateOnlyInfoWord = (updatedData = {}, updateId) => {
   });
 };
 
+const markAsReviewed = (updateId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Check if the word is existed
+      const checkWord = await Word.findById(updateId);
+      if (!checkWord) {
+        resolve({
+          status: CONFIG_MESSAGE_ERRORS.INVALID.status,
+          message: "The word is not existed",
+          typeError: CONFIG_MESSAGE_ERRORS.INVALID.type,
+          data: null,
+          statusMessage: "Error",
+        });
+        return;
+      }
+
+      const currentStep = checkWord.step;
+      // Get period of the next step
+      let nextPeriod = await Period.findOne({ step: currentStep + 1 });
+
+      // If the next step is not existed, get the period of the current step
+      if (!nextPeriod) {
+        nextPeriod = await Period.findOne({ step: currentStep });
+      }
+
+      // Recalculate nextReviewDate, reviewCount, step, reviewHistory
+      const nextViewDay = nextPeriod.nextViewDay;
+      const nextReviewDate = dayjs.utc().add(nextViewDay, 'day').toDate();
+      const reviewCount = checkWord.reviewCount + 1;
+      const step = nextPeriod.step;
+      const reviewHistory = [...checkWord.reviewHistory, {
+        reviewDate: dayjs.utc().toDate(),
+        step: currentStep
+      }];
+
+      const updatedData = {
+        nextReviewDate,
+        reviewCount,
+        step,
+        reviewHistory
+      };
+
+      // Modify fields
+      Object.assign(checkWord, updatedData);
+      // Save the updated document
+      await checkWord.save();
+
+      return resolve({
+        status: CONFIG_MESSAGE_ERRORS.ACTION_SUCCESS.status,
+        message: "updated successfully",
+        typeError: "",
+        data: checkWord,
+        statusMessage: "Success",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   create,
   getWords,
-  updateOnlyInfoWord
+  updateOnlyInfoWord,
+  markAsReviewed
 };

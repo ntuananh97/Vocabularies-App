@@ -91,8 +91,27 @@ const updateOnlyInfoWord = async (req, res) => {
   }
 };
 
+const markAsReviewed = async (req, res) => {
+  try {
+    const updateId = req.params.id;
+
+    const response = await WordService.markAsReviewed(updateId);
+    const { data, status, typeError, message, statusMessage } = response;
+
+    return res.status(status).json({
+      typeError,
+      data,
+      message,
+      status: statusMessage,
+    });
+  } catch {
+    return returnInternalErrorResponse(res);
+  }
+};
+
 module.exports = {
   createWord,
   getWords,
-  updateOnlyInfoWord
+  updateOnlyInfoWord,
+  markAsReviewed
 };
