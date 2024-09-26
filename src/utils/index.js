@@ -12,8 +12,17 @@ const validateRequiredInput = (data, arrRequired) => {
   return missingFields;
 };
 
+// a function that check if the required field has a value but it's empty
+const checkEmptyRequiredFields = (data, arrRequired) => {
+  const emptyRequiredFields = arrRequired.filter(
+    (field) => typeof data[field] === "string" && data[field].trim() === ""
+  );
+  return emptyRequiredFields;
+};
+
 
 
 module.exports = {
   validateRequiredInput,
+  checkEmptyRequiredFields
 };

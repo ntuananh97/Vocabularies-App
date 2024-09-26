@@ -6,5 +6,6 @@ const protectRoute = require("../middleware/protectRoute");
 
 router.post("/", protectRoute, wordControllers.createWord);
 router.get("/", protectRoute, wordControllers.getWords);
+router.put("/:id", protectRoute, wordControllers.updateOnlyInfoWord);
 
 module.exports = router;

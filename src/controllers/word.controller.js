@@ -1,8 +1,8 @@
 const { CONFIG_MESSAGE_ERRORS } = require("../configs/constants");
-const { validateRequiredInput } = require("../utils");
+const { validateRequiredInput, checkEmptyRequiredFields } = require("../utils");
 const WordService = require("../services/WordService");
 
-const { returnInternalErrorResponse } = require("../utils/returnResponse");
+const { returnInternalErrorResponse, returnInvalidErrorResponse } = require("../utils/returnResponse");
 
 const createWord = async (req, res) => {
   // validate
@@ -57,8 +57,42 @@ const getWords = async (req, res) => {
   }
 };
 
+const updateOnlyInfoWord = async (req, res) => {
+  try {
+    const updateId = req.params.id;
+
+
+    // Validate empty required fields
+    const emptyRequiredFields = checkEmptyRequiredFields(req.body, [
+      "title",
+      "keyWord",
+      "pronounciation",
+      "definition",
+      "lessonId",
+      "topicId",
+    ]);
+    if (emptyRequiredFields.length > 0) {
+      return returnInvalidErrorResponse(res, {
+        message: `The field [${emptyRequiredFields[0]}] must not be empty`,
+      });
+    }
+
+    const response = await WordService.updateOnlyInfoWord(req.body, updateId);
+    const { data, status, typeError, message, statusMessage } = response;
+
+    return res.status(status).json({
+      typeError,
+      data,
+      message,
+      status: statusMessage,
+    });
+  } catch {
+    return returnInternalErrorResponse(res);
+  }
+};
 
 module.exports = {
   createWord,
   getWords,
+  updateOnlyInfoWord
 };

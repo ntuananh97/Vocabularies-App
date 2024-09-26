@@ -155,7 +155,48 @@ const getWords = (req) => {
   });
 };
 
+const updateOnlyInfoWord = (updatedData = {}, updateId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Check if the word is existed
+      const checkWord = await Word.findById(updateId);
+      if (!checkWord) {
+        resolve({
+          status: CONFIG_MESSAGE_ERRORS.INVALID.status,
+          message: "The word is not existed",
+          typeError: CONFIG_MESSAGE_ERRORS.INVALID.type,
+          data: null,
+          statusMessage: "Error",
+        });
+        return;
+      }
+
+      // Don't update nextReviewDate, reviewCount, step, reviewHistory
+      delete updatedData.nextReviewDate;
+      delete updatedData.reviewCount;
+      delete updatedData.step;
+      delete updatedData.reviewHistory;
+
+      // Modify fields
+      Object.assign(checkWord, updatedData);
+      // Save the updated document
+      await checkWord.save();
+
+      return resolve({
+        status: CONFIG_MESSAGE_ERRORS.ACTION_SUCCESS.status,
+        message: "updated successfully",
+        typeError: "",
+        data: checkWord,
+        statusMessage: "Success",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   create,
   getWords,
+  updateOnlyInfoWord
 };
