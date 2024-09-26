@@ -1,4 +1,5 @@
 const { cloudinary } = require("../configs/cloudinary");
+const fs = require('fs');
 const {
   returnInternalErrorResponse,
   returnGetSuccessResponse,
@@ -25,6 +26,8 @@ const uploadImage = async (req, res) => {
     const uploadedFile = req.files.file;
     // Lấy tên gốc của file từ file.name
     const originalFileName = getOriginalFileNameFromFileName(uploadedFile.name);
+
+    // Upload to cloundinary
     const result = await cloudinary.uploader.upload(
       uploadedFile.tempFilePath,
       // optionsCloundinary
@@ -32,6 +35,14 @@ const uploadImage = async (req, res) => {
         public_id: originalFileName,
       }
     );
+
+    // Remove temporary file after uploading
+    fs.unlink(uploadedFile.tempFilePath, (err) => {
+      if (err) {
+        console.error(`Error when deleting the temporary file: ${uploadedFile.tempFilePath}`, err);
+      }
+    });
+
     return returnGetSuccessResponse(res, {
       message: "Upload successfully",
       data: {
