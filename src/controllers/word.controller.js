@@ -52,7 +52,7 @@ const getWords = async (req, res) => {
       message,
     });
   } catch (error) {
-    console.log("getLessons ~ error:", error.message)
+    console.log("getWord ~ error:", error.message)
     return returnInternalErrorResponse(res, {error: error.message});
   }
 };

@@ -1,9 +1,11 @@
 /* eslint-disable no-async-promise-executor */
 
-const { CONFIG_MESSAGE_ERRORS } = require("../configs/constants");
+const { CONFIG_MESSAGE_ERRORS, DEFAULT_PAGE_SIZE, DEFAULT_PAGE } = require("../configs/constants");
 const dayjs = require('dayjs');
 const Word = require('../models/word.model');
 const Period = require('../models/period.model');
+
+const ENABLE_USE_REVIEW_TODAY = "1";
 
 
 const create = (newData, createdUserId) => {
@@ -79,39 +81,66 @@ const create = (newData, createdUserId) => {
   });
 };
 
+// filter, sort
 const getWords = (req) => {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("getWords ~ req:", req.query);
-      const {useReviewToday, sort} = req.query;
-      console.log("returnnewPromise ~ sort:", sort)
+      const {useReviewToday, sort, filter, limit, page} = req.query;
 
-      let query = {};
+      let query = filter ? JSON.parse(filter) : {};
       let sortCondition = {};
+
+      // pagination
+      const calcLimit = +limit || DEFAULT_PAGE_SIZE;
+      const calcPage = +page || DEFAULT_PAGE;
+      const skip = (calcPage - 1) * calcLimit;
 
       // Sort data
       if (sort) {
         const parsedSort = JSON.parse(sort);
         Object.keys(parsedSort).forEach((key) => {
-          console.log("Object.keys ~ key:", key, parsedSort[key])
           sortCondition[key] = parsedSort[key] === 'asc' ? 1 : -1;
         });
-        console.log("returnnewPromise ~ sortCondition:", parsedSort, sortCondition)
       }
 
         // Get all words that need to be reviewed less than or equal to today
-      if (useReviewToday === "1") {
+      if (useReviewToday === ENABLE_USE_REVIEW_TODAY) {
         const todayUTC = dayjs.utc().endOf('day');
-        console.log("returnnewPromise ~ todayUTC:", dayjs(todayUTC).format('YYYY-MM-DD HH:mm:ss'));
-
-        query = { nextReviewDate: { $lte: todayUTC.toDate() } };
+        query = { ...query ,nextReviewDate: { $lte: todayUTC.toDate() } };
       }
 
+      // search by regex with some fields
+      const searchFields = ["title", "keyWord", "definition"];
+      searchFields.forEach((field) => {
+        if (query[field]) {
+          query[field] = { $regex: query[field]?.trim() || "", $options: "i" };
+        }
+      });
+
       const loggedInUser = req.user._id;
+      query = { ...query, userId: loggedInUser };
 
+      const result = await Word.aggregate([
+        { $match: query },
+        {
+          $facet: {
+            words: [
+              { $sort: sortCondition },  // sort
+              { $skip: skip },        
+              { $limit: calcLimit }      
+            ],
+            totalCount: [
+              { $count: "count" }    // Count total documents
+            ]
+          }
+        }
+      ]);
 
-      // Get all data of user
-      const data = await Word.find({ userId: loggedInUser, ...query }).sort(sortCondition);
+      const data = {
+        list: result[0].words || [],
+        totalCount: result[0].totalCount?.[0]?.count || 0
+      };
+
 
       return resolve({
         status: CONFIG_MESSAGE_ERRORS.GET_SUCCESS.status,

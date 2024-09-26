@@ -91,10 +91,15 @@ const CONFIG_MESSAGE_ERRORS = {
   };
 
   const TOKEN_NAME = "token";
+
+  const DEFAULT_PAGE_SIZE = 10;
+  const DEFAULT_PAGE = 1;
   
 
 module.exports = {
   CONFIG_PERMISSIONS,
   CONFIG_MESSAGE_ERRORS,
-  TOKEN_NAME
+  TOKEN_NAME,
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_PAGE
 };
