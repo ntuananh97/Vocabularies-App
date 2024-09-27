@@ -13,7 +13,7 @@ const { Title, Link } = Typography;
 export default function Home() {
   return (
     <>
-      <h3>Dashboard</h3>
+      <h3>Hello Dashboard</h3>
       <Row>
         <Col style={{ padding: 5 }}>
           <Card
