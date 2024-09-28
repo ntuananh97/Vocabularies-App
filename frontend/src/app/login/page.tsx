@@ -1,6 +1,6 @@
 import React from 'react';
-import Login from '../views/pages/login';
 import { Metadata } from 'next';
+import Login from '@/views/pages/login';
 
 export const metadata: Metadata = {
   title: 'Login',

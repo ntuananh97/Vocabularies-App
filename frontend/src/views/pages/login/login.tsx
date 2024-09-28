@@ -9,8 +9,8 @@ import React from 'react';
 const { Title } = Typography;
 
 type FieldType = {
-  username?: string;
-  password?: string;
+  email: string;
+  password: string;
   remember?: string;
 };
 
@@ -37,9 +37,9 @@ const Login = () => {
         layout="vertical"
       >
         <Form.Item<FieldType>
-          label="Username"
-          name="username"
-          rules={[{ required: true, message: 'Please input your username!' }]}
+          label="Email"
+          name="email"
+          rules={[{ required: true, message: 'Please input your email!' }, { type: 'email' }]}
         >
           <Input />
         </Form.Item>
