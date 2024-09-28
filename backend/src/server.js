@@ -15,7 +15,12 @@ const app = express();
 const server = http.createServer(app); // thiết lập socket io cho sau này
 
 dotenv.config();
-app.use(cors());
+
+// Configure CORS
+app.use(cors({
+    origin: 'http://localhost:3000', // Specify the frontend domain
+    credentials: true, // Allow sending cookies with requests
+}));
 
 // Cookie parser
 app.use(cookieParser());
