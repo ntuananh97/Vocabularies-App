@@ -8,7 +8,7 @@ const ProtectedAuthRoute = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
 
   if (user) {
-    redirect(ROUTE_CONFIG.DASHBOARD);
+    redirect(ROUTE_CONFIG.TOPIC);
   }
 
   return <>{children}</>;
