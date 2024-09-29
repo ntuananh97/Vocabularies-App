@@ -6,3 +6,5 @@ export type TTopicType = {
   updatedAt: string;
 };
 
+export type TTopicFormData = Pick<TTopicType, 'name'>;
+
