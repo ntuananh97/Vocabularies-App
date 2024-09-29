@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: React.PropsWithChildren) => {
 
   return (
-    <html className={roboto.className}>
+    <html>
       <head />
       <body>
           <AntdRegistry>
