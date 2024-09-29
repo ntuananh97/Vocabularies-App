@@ -2,21 +2,16 @@
 
 import NavLink from '@/app/nav-link';
 import { ROUTE_CONFIG } from '@/configs/route';
+import { TSignUpType } from '@/types/auth/auth';
 import { Button, Form, Input, Typography } from 'antd';
 import React from 'react';
 
 const { Title } = Typography;
 
-type TSignUpFieldType = {
-  name: string;
-  password: string;
-  confirmPass: string;
-  email: string;
-  avatar: string;
-};
+
 
 const Register = () => {
-  const onFinish = (values: TSignUpFieldType) => {
+  const onFinish = (values: TSignUpType) => {
     console.log('Success:', values);
   };
 
@@ -31,7 +26,7 @@ const Register = () => {
         autoComplete="off"
         layout="vertical"
       >
-        <Form.Item<TSignUpFieldType>
+        <Form.Item<TSignUpType>
           label="Name"
           name="name"
           rules={[{ required: true, message: 'Please input your name!' }]}
@@ -39,7 +34,7 @@ const Register = () => {
           <Input />
         </Form.Item>
 
-        <Form.Item<TSignUpFieldType>
+        <Form.Item<TSignUpType>
           label="Password"
           name="password"
           hasFeedback
@@ -47,7 +42,7 @@ const Register = () => {
         >
           <Input.Password />
         </Form.Item>
-        <Form.Item<TSignUpFieldType>
+        <Form.Item<TSignUpType>
           label="Confirm password"
           name="confirmPass"
           hasFeedback
@@ -73,7 +68,7 @@ const Register = () => {
         >
           <Input.Password />
         </Form.Item>
-        <Form.Item<TSignUpFieldType>
+        <Form.Item<TSignUpType>
           label="Email"
           name="email"
           rules={[
@@ -86,7 +81,7 @@ const Register = () => {
         >
           <Input />
         </Form.Item>
-        <Form.Item<TSignUpFieldType> label="Avatar (Image URL)" name="avatar">
+        <Form.Item<TSignUpType> label="Avatar (Image URL)" name="avatar">
           <Input />
         </Form.Item>
 

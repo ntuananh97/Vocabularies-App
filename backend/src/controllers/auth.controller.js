@@ -1,7 +1,7 @@
 const { CONFIG_MESSAGE_ERRORS, TOKEN_NAME } = require("../configs/constants");
 const User = require("../models/UserModel");
 const { generateTokenAndSetCookie } = require("../utils/generateToken");
-const { returnInternalErrorResponse } = require("../utils/returnResponse");
+const { returnInternalErrorResponse, returnGetSuccessResponse } = require("../utils/returnResponse");
 const bcrypt = require("bcrypt");
 
 
@@ -50,7 +50,21 @@ const logout = async (req, res) => {
   }
 };
 
+const getMe = async (req, res) => {
+  try {
+    
+    return returnGetSuccessResponse(res, {
+      data: req.user,
+    })
+    
+  } catch (error) {
+    console.log("error in getMe", error);
+    return returnInternalErrorResponse(res);
+  }
+};
+
 module.exports = {
   login,
-  logout
+  logout,
+  getMe
 };

@@ -1,6 +1,7 @@
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { Metadata } from 'next';
 import { Roboto } from 'next/font/google'
+import { AuthProvider } from '@/contexts/AuthContext';
 import 'antd/dist/reset.css';
 import '../styles/index.scss';
 
@@ -23,9 +24,11 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
     <html className={roboto.className}>
       <head />
       <body>
-        <AntdRegistry>
-          {children}
-        </AntdRegistry>
+          <AntdRegistry>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </AntdRegistry>
       </body>
     </html>
   );

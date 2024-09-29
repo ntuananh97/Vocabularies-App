@@ -3,6 +3,7 @@ export const ROUTE_CONFIG = {
   HOME: '/',
   LOGIN: '/login',
   REGISTER: "/register",
+  DASHBOARD: '/dashboard',
 
 
   // Replace this with your own routes
@@ -31,5 +32,4 @@ export const ROUTE_CONFIG = {
     PAYMENT_TYPE: '/settings/payment-type',
     DELIVERY_TYPE: '/settings/delivery-type'
   },
-  DASHBOARD: '/dashboard'
 }

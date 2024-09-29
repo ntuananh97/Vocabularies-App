@@ -1,29 +1,26 @@
 "use client"
-
+import React from 'react';
 import NavLink from '@/app/nav-link';
 import { ROUTE_CONFIG } from '@/configs/route';
-import { Button, Checkbox, Divider, Form, Input, Typography } from 'antd';
-import React from 'react';
-
+import useLogin from '@/hooks/useLogin';
+import { TLoginType } from '@/types/auth/auth';
+import { Button, Checkbox, Divider, Form, Input,Typography } from 'antd';
 
 const { Title } = Typography;
 
-type FieldType = {
-  email: string;
-  password: string;
-  remember?: string;
-};
-
-
 const Login = () => {
 
-    const onFinish = (values: FieldType) => {
-        console.log('Success:', values);
-    };
+  const { handleLogin, loading } = useLogin();
 
-    const loginByGoogle = () => {
-        console.log('Login by Google');
-    };
+  const onFinish = async (values: TLoginType) => {
+    console.log('Success:', values);
+    handleLogin(values);
+
+  };
+
+  const loginByGoogle = () => {
+    console.log('Login by Google');
+  };
 
   return (
     <div className='login-regiter-layout'>
@@ -36,7 +33,7 @@ const Login = () => {
         autoComplete="off"
         layout="vertical"
       >
-        <Form.Item<FieldType>
+        <Form.Item<TLoginType>
           label="Email"
           name="email"
           rules={[{ required: true, message: 'Please input your email!' }, { type: 'email' }]}
@@ -44,7 +41,7 @@ const Login = () => {
           <Input />
         </Form.Item>
 
-        <Form.Item<FieldType>
+        <Form.Item<TLoginType>
           label="Password"
           name="password"
           rules={[{ required: true, message: 'Please input your password!' }]}
@@ -52,12 +49,12 @@ const Login = () => {
           <Input.Password />
         </Form.Item>
 
-        <Form.Item<FieldType> name="remember" valuePropName="checked">
+        <Form.Item<TLoginType> name="remember" valuePropName="checked">
           <Checkbox>Remember me</Checkbox>
         </Form.Item>
 
         <Form.Item style={{ textAlign: 'center' }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
             Submit
           </Button>
         </Form.Item>
