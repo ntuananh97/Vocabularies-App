@@ -21,7 +21,7 @@ const useLogin = () => {
     try {
      const response = await loginAuth(data);
       console.log('run', response);
-      login(response)
+      login(response.data)
       
     } catch (error) {
       handleErrorResponse(error);

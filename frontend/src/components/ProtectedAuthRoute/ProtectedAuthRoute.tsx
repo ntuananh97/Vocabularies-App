@@ -2,14 +2,18 @@
 
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTE_CONFIG } from '@/configs/route';
-import { redirect } from 'next/navigation';
+import {  useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 const ProtectedAuthRoute = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
+  const router = useRouter();
 
-  if (user) {
-    redirect(ROUTE_CONFIG.TOPIC);
-  }
+  useEffect(() => {
+    if (user) router.replace(ROUTE_CONFIG.TOPIC);
+    
+  }, [user])
+ 
 
   return <>{children}</>;
 };

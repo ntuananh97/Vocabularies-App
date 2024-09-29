@@ -50,11 +50,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = (userData: TUser) => {
     setUser(userData);
+    router.push(ROUTE_CONFIG.TOPIC);
    
   };
 
   const logout = () => {
     setUser(null);
+    router.push(ROUTE_CONFIG.LOGIN);
   };
 
   return (

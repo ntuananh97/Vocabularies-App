@@ -7,9 +7,6 @@ import { ROUTE_CONFIG } from '@/configs/route';
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
 
-  if (!user) {
-    redirect(ROUTE_CONFIG.LOGIN);
-  }
   
   if (!user) {
     return null; // Có thể hiển thị loading trong khi chờ điều hướng
