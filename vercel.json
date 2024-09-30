@@ -10,9 +10,7 @@
             "use": "@vercel/next"
         }
     ],
-    "routes": [
-        { "src": "/backend/(.*)", "dest": "src/server.js" }
-    ],
+    "rewrites": [{ "source": "/backend/(.*)", "destination": "/src" }],
     "env": {
         "NODE_ENV": "production"
     }
