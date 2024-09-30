@@ -20,7 +20,6 @@ const useLogin = () => {
 
     try {
      const response = await loginAuth(data);
-      console.log('run', response);
       login(response.data)
       
     } catch (error) {

@@ -16,7 +16,6 @@ const useTopic = () => {
     try {
      const response = await getTopics();
      setTopics(response.data);
-      console.log('run', response);
       
     } catch (error) {
       handleErrorResponse(error);

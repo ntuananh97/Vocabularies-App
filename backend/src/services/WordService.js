@@ -4,6 +4,8 @@ const { CONFIG_MESSAGE_ERRORS, DEFAULT_PAGE_SIZE, DEFAULT_PAGE } = require("../c
 const dayjs = require('dayjs');
 const Word = require('../models/word.model');
 const Period = require('../models/period.model');
+const { convertStringToObjectId } = require("../utils");
+const { getDateQuery } = require("../utils/convertDate");
 
 const ENABLE_USE_REVIEW_TODAY = "1";
 
@@ -117,18 +119,39 @@ const getWords = (req) => {
         }
       });
 
+      // convert string to number for some fields
+      const stringToNumberFileds = ["step", "reviewCount"];
+      stringToNumberFileds.forEach((field) => {
+        if (query[field]) query[field] = +query[field];
+      });
+
+      // convert some fields to ObjectId
+      const stringToObjectIdFileds = ["topicId", "lessonId"];
+      stringToObjectIdFileds.forEach((field) => {
+        if (query[field]) query[field] = convertStringToObjectId(query[field]);
+      });
+
+      // Convert createdAt
+      const createdAt = getDateQuery("createdAt", query);
+      const updatedAt = getDateQuery("updatedAt", query);
+
       const loggedInUser = req.user._id;
-      query = { ...query, userId: loggedInUser };
+      query = { ...query, userId: loggedInUser, ...createdAt, ...updatedAt };
+
+      const wordsQuery = [
+        { $limit: calcLimit },    
+        { $skip: skip },        
+      ];
+
+      if (Object.keys(sortCondition).length > 0) {
+        wordsQuery.unshift({ $sort: sortCondition });
+      }
 
       const result = await Word.aggregate([
         { $match: query },
         {
           $facet: {
-            words: [
-              { $sort: sortCondition },  // sort
-              { $skip: skip },        
-              { $limit: calcLimit }      
-            ],
+            words: wordsQuery,
             totalCount: [
               { $count: "count" }    // Count total documents
             ]

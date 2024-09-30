@@ -9,9 +9,14 @@ export const API_ENDPOINTS = {
     },
     TOPIC: {
         INDEX: `/topics`,
-        // GET_BY_ID: (id: string) => `/topic/${id}`,
-        // CREATE: `/topic`,
-        // UPDATE: (id: string) => `/topic/${id}`,
-        // DELETE: (id: string) => `/topic/${id}`,
-    }
+    },
+    WORD: {
+        INDEX: `/words`,
+    },
+    PERIOD: {
+        INDEX: `/periods`,
+    },
+    LESSON: {
+        INDEX: `/lessons`,
+    },
 };

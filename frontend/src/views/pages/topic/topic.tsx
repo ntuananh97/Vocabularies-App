@@ -1,6 +1,8 @@
 'use client'
 
+import NavLink from '@/app/nav-link';
 import TopicModal from '@/components/Modals/TopicModal';
+import { ROUTE_CONFIG } from '@/configs/route';
 import useTopic from '@/hooks/useTopic'
 import { useStore } from '@/store';
 import { TTopicType } from '@/types/topic';
@@ -16,7 +18,6 @@ const Topic = () => {
 
   const [isOpenTopicModal, setIsOpenTopicModal] = useState(false)
   const [editTopicData, setEditTopicData] = useState<TTopicType>(inititalTopicData)
-  console.log("Topic ~ topics:", topics)
 
 
   const fetchData =  () => {
@@ -29,16 +30,17 @@ const Topic = () => {
   }, [])
   
   const openTopicModal = (item?: TTopicType) => {
-    console.log('Open topic modal')
     setIsOpenTopicModal(true);
     setEditTopicData(item || inititalTopicData)
   }
 
   return (
     <div>
-      <div className='flex justify-between items-center'>
+      <div className="flex justify-between items-center">
         <Title level={2}>List of Topics</Title>
-        <Button type='primary' onClick={() => openTopicModal()}>Add topic</Button>
+        <Button type="primary" onClick={() => openTopicModal()}>
+          Add topic
+        </Button>
       </div>
       <List
         className="demo-loadmore-list"
@@ -49,14 +51,28 @@ const Topic = () => {
         renderItem={(item) => (
           <List.Item
             key={item._id}
-            actions={[<Button key="edit-action" onClick={() => openTopicModal(item)}>Edit</Button>]}
+            actions={[
+              <Button key="edit-action" onClick={() => openTopicModal(item)}>
+                Edit
+              </Button>,
+            ]}
           >
-            <List.Item.Meta title={item.name} />
+            <List.Item.Meta
+              title={
+                <NavLink href={`${ROUTE_CONFIG.TOPIC}/${item._id}`}>
+                  {item.name}
+                </NavLink>
+              }
+            />
           </List.Item>
         )}
       />
 
-      <TopicModal visible={isOpenTopicModal} onCancel={() => setIsOpenTopicModal(false)} editData={editTopicData} />
+      <TopicModal
+        visible={isOpenTopicModal}
+        onCancel={() => setIsOpenTopicModal(false)}
+        editData={editTopicData}
+      />
     </div>
   );
 }

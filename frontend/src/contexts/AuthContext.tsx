@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ROUTE_CONFIG } from '@/configs/route';
 import { getMe } from '@/services/auth';
 import { TUser } from '@/types/auth';
+import '@/configs/dayjs-config';
 
 type TUserContext = TUser | null;
 
@@ -33,7 +34,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setStatus(true)
         const  response = await getMe();
         const userData = response.data;
-        console.log('user', userData);
         
         setUser(userData);
       } catch {

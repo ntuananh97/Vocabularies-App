@@ -68,6 +68,26 @@ const getList = () => {
   });
 };
 
+const getOne = (topicId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      
+      // Get all data
+      const data = await Topic.findById(topicId);
+
+      return resolve({
+        status: CONFIG_MESSAGE_ERRORS.GET_SUCCESS.status,
+        message: "Get data success",
+        data,
+        statusMessage: "Success",
+      });
+    } catch (error) {
+      console.log("getOne ~ error:", error)
+      reject(error);
+    }
+  });
+};
+
 const update = (updatedData = {}, updateId) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -121,4 +141,5 @@ module.exports = {
   create,
   getList,
   update,
+  getOne
 };

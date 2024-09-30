@@ -73,9 +73,28 @@ const updateTopic = async (req, res) => {
   }
 };
 
+const getOneTopic = async (req, res) => {
+  try {
+    const topicId = req.params.id;
+
+    const response = await TopicService.getOne(topicId);
+    const { data, status, typeError, message, statusMessage } = response;
+
+    return res.status(status).json({
+      typeError,
+      data,
+      message,
+      status: statusMessage,
+    });
+  } catch (error){
+    return returnInternalErrorResponse(res, {error: error.message});
+  }
+};
+
 
 module.exports = {
   createTopic,
   getTopics,
-  updateTopic
+  updateTopic,
+  getOneTopic
 };

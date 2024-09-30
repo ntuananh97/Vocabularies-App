@@ -94,7 +94,7 @@ const CONFIG_MESSAGE_ERRORS = {
 
   const DEFAULT_PAGE_SIZE = 10;
   const DEFAULT_PAGE = 1;
-  
+
 
 module.exports = {
   CONFIG_PERMISSIONS,

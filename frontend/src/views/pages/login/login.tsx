@@ -13,7 +13,6 @@ const Login = () => {
   const { handleLogin, loading } = useLogin();
 
   const onFinish = async (values: TLoginType) => {
-    console.log('Success:', values);
     handleLogin(values);
 
   };

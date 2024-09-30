@@ -1,3 +1,5 @@
+const { default: mongoose } = require("mongoose");
+
 // Only validate the string fields that are required
 const validateRequiredInput = (data, arrRequired) => {
   const missingFields = arrRequired.filter(
@@ -20,9 +22,14 @@ const checkEmptyRequiredFields = (data, arrRequired) => {
   return emptyRequiredFields;
 };
 
+const convertStringToObjectId = (str) => {
+  const newString = new mongoose.Types.ObjectId(str)
+  return newString
+};
 
 
 module.exports = {
   validateRequiredInput,
-  checkEmptyRequiredFields
+  checkEmptyRequiredFields,
+  convertStringToObjectId
 };
