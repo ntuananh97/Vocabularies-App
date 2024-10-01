@@ -45,7 +45,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
 
   const [filter, setFilter] = useState<TWordSearchForm>({} as TWordSearchForm);
 
-  const [params, setParams] = useState({
+  const [params, setParams] = useState<TSearchWordParams>({
     topicId,
     useReviewToday: ENABLE_USE_REVIEW,
     page: 1,

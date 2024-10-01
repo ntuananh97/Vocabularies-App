@@ -41,4 +41,8 @@ export type TSearchWordParams = {
   sort?: string
 };
 
+export type TApiSearchWordParams = TSearchWordParams & {
+  filter?: string;
+};
+
 
