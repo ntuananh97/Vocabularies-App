@@ -1,4 +1,5 @@
 import { Dayjs } from "dayjs";
+import { ENABLE_USE_REVIEW } from '../../configs/words';
 
 export type TDatePickerValue = Dayjs | undefined
 
@@ -32,7 +33,12 @@ export type TWordSearchForm = TWordType & {
 };
 
 export type TSearchWordParams = {
-  newFilter?: TWordSearchForm; 
+  filter?: Partial<TWordSearchForm>;
+  topicId?: string
+  useReviewToday?: typeof ENABLE_USE_REVIEW
+  page?: number
+  pageSize?: number
+  sort?: string
 };
 
 

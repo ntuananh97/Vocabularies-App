@@ -57,7 +57,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
   const fetchData = async (searchParams?: TSearchWordParams) => {
     setLoading(true);
 
-    const newFilter = searchParams?.newFilter || filter;
+    const newFilter = searchParams?.filter || filter;
 
     // remove empty fields
     Object.keys(newFilter).forEach((key) => {
@@ -73,7 +73,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
 
     const newParams = {
       ...params,
-      filter: JSON.stringify(searchParams?.newFilter || filter),
+      filter: JSON.stringify(newFilter),
     };
 
     try {
@@ -89,9 +89,9 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
   };
 
   const debouncedSearch = React.useRef(
-    debounce(async (newFilter) => {
+    debounce(async (newFilter: TWordSearchForm) => {
       fetchData({
-        newFilter
+        filter: newFilter
       });
     }, TIME_TO_SEARCH)
   ).current;
