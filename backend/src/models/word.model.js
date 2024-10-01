@@ -17,8 +17,8 @@ const wordSchema = new mongoose.Schema(
     definition: { type: String, required: true },
     description: { type: String },
     antonym: { type: String },
-    sounds: { type: [String] },
-    images: { type: [String] },
+    sounds: { type: [String], default: [] },
+    images: { type: [String], default: [] },
     examples: { type: [String] },
     reviewCount: { type: Number, default: 0 },
     step: { type: Number, default: 1 },
@@ -27,7 +27,6 @@ const wordSchema = new mongoose.Schema(
     lessonId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Lesson",
-      required: true,
     },
     topicId: {
       type: mongoose.Schema.Types.ObjectId,

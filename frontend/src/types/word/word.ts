@@ -45,4 +45,8 @@ export type TApiSearchWordParams = TSearchWordParams & {
   filter?: string;
 };
 
+export type TWordFormDataType = Partial<TWordType> & {
+
+}
+
 

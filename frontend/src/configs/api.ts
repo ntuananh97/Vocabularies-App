@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
     },
     WORD: {
         INDEX: `/words`,
+        MARK: `/words/markAsReviewed`,
     },
     PERIOD: {
         INDEX: `/periods`,

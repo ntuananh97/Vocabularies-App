@@ -4,8 +4,8 @@ import { Select, SelectProps } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 interface ILessonSelectProps extends SelectProps {
-  onChange: (_value: string) => void;
-  value: string;
+  onChange?: (_value: string) => void;
+  value?: string;
 }
 
 const LessonSelect: React.FC<ILessonSelectProps> = ({
@@ -30,7 +30,7 @@ const LessonSelect: React.FC<ILessonSelectProps> = ({
   }, []);
 
   const handleChange = (value: string) => {
-    onChange(value);
+    onChange?.(value);
   };
 
   return (

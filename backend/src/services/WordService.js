@@ -56,6 +56,8 @@ const create = (newData, createdUserId) => {
         nextReviewDate
       };
 
+      if (!lessonId) delete newData.lessonId;
+
       const createdData = await Word.create(newData);
 
       if (createdData) {

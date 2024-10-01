@@ -12,7 +12,6 @@ const createWord = async (req, res) => {
       "keyWord",
       "pronounciation",
       "definition",
-      "lessonId",
       "topicId",
     ]);
 

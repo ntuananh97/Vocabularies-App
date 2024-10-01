@@ -1,18 +1,22 @@
 'use client';
 
-import TopicModal from '@/components/Modals/TopicModal';
+import WordModal from '@/components/Modals/WordModal';
 import {
   DATE_FORMAT,
   PAGE_SIZE,
   SORT_TYPE,
 } from '@/configs/constants';
-import { handleErrorResponse } from '@/helpers/response';
-import { getWords } from '@/services/word';
+import { handleErrorResponse, handleSuccessResponse } from '@/helpers/response';
+import { getWords, markWordAsReviewed } from '@/services/word';
 import { TTopicType } from '@/types/topic';
 import { TSearchWordParams, TWordSearchForm, TWordType } from '@/types/word';
-import { Table, TableProps, Typography } from 'antd';
+import { Button, Table, TableProps, Tooltip, Typography } from 'antd';
+import {
+  EditOutlined,
+  CheckOutlined,
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import WordSearch from './WordSearch';
 import debounce from 'lodash/debounce';
 import { ENABLE_USE_REVIEW, SEARCH_WORD_FIELDS } from '@/configs/words';
@@ -24,17 +28,17 @@ interface IReviewProps {
 const TIME_TO_SEARCH = 300; // ms
 
 const { Title } = Typography;
-const inititalTopicData = {} as TWordType;
+const inititalEditData = {} as TWordType;
 
 const Review: React.FC<IReviewProps> = ({ topicData }) => {
   const topicId = topicData._id;
 
-  const [isOpenTopicModal, setIsOpenTopicModal] = useState(false);
+  const [isOpenWordModal, setIsOpenWordModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [reviewWords, setReviewWords] = useState<TWordType[]>([]);
 
   const [editTopicData, setEditTopicData] =
-    useState<TWordType>(inititalTopicData);
+    useState<TWordType>(inititalEditData);
   const [pagination, setPagination] = useState<{
     current: number;
     total: number;
@@ -96,18 +100,21 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
     }, TIME_TO_SEARCH)
   ).current;
 
-  useEffect(() => {
+  const handleFetchData = () => {
     fetchData();
+  }
+
+  useEffect(() => {
+    handleFetchData();
 
     return () => {
       debouncedSearch.cancel();
     };
   }, [debouncedSearch]);
 
-  const openTopicModal = (item?: TWordType) => {
-    console.log('Open topic modal');
-    setIsOpenTopicModal(true);
-    setEditTopicData(item || inititalTopicData);
+  const openWordModal = (item?: TWordType) => {
+    setIsOpenWordModal(true);
+    setEditTopicData(item || inititalEditData);
   };
 
 
@@ -117,6 +124,16 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
 
     debouncedSearch(newFilter);
   };
+
+  const handleReview = async (wordId: string) => {
+    try {
+      await markWordAsReviewed(wordId);
+      handleSuccessResponse('Word marked as reviewed');
+      handleFetchData();
+    } catch (error) {
+      handleErrorResponse(error);
+    }
+  }
 
   const columns: TableProps<TWordType>['columns'] = [
     {
@@ -152,12 +169,26 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
       key: 'updatedAt',
       render: (val) => dayjs(val).format(DATE_FORMAT),
     },
+    {
+      key: 'action',
+      render: (_, record) => (
+        <div className='flex items-center gap-1'>
+          <Tooltip title="Edit">
+            <Button onClick={() => openWordModal(record)} type='text' icon={<EditOutlined />} />
+          </Tooltip>
+          <Tooltip title="Review">
+            <Button onClick={() => handleReview(record._id)} type='text' icon={<CheckOutlined />} />
+          </Tooltip>
+        </div>
+      ),
+    },
   ];
 
   return (
     <div>
       <div className="flex justify-between items-center">
         <Title level={2}>{topicData.name}</Title>
+        <Button type='primary' onClick={() => openWordModal()}>Add Word</Button>
       </div>
 
       <div className="mb-5">
@@ -171,11 +202,13 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
         loading={loading}
       />
 
-      {/* <TopicModal
-        visible={isOpenTopicModal}
-        onCancel={() => setIsOpenTopicModal(false)}
+      <WordModal
+        visible={isOpenWordModal}
+        onCancel={() => setIsOpenWordModal(false)}
         editData={editTopicData}
-      /> */}
+        onRefreshData={handleFetchData}
+        topicId={topicId}
+      />
     </div>
   );
 };
