@@ -14,12 +14,15 @@ import { Button, Table, TableProps, Tooltip, Typography } from 'antd';
 import {
   EditOutlined,
   CheckOutlined,
+  SoundOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import WordSearch from './WordSearch';
 import debounce from 'lodash/debounce';
 import { ENABLE_USE_REVIEW, SEARCH_WORD_FIELDS } from '@/configs/words';
+import { readText } from '@/utils';
+import SpeakTextWrapper from '@/components/SpeakTextWrapper';
 
 interface IReviewProps {
   topicData: TTopicType;
@@ -53,7 +56,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
     useReviewToday: ENABLE_USE_REVIEW,
     page: 1,
     pageSize: PAGE_SIZE,
-    sort: JSON.stringify({ reviewCount: SORT_TYPE.ASC }),
+    sort: JSON.stringify({ reviewCount: SORT_TYPE.ASC, updatedAt: SORT_TYPE.DESC }),
   });
 
 
@@ -142,12 +145,14 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
       title: <div>Sentence Hello</div>,
       dataIndex: 'title',
       key: 'title',
-      // render: (text) => <a>{text}</a>,
+      render: (text) => <SpeakTextWrapper text={text} />,
     },
     {
       title: 'Word',
       dataIndex: 'keyWord',
       key: 'keyWord',
+      render: (text) => <SpeakTextWrapper text={text} />,
+
     },
 
     {

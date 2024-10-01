@@ -10,7 +10,7 @@ const { getDateQuery } = require("../utils/convertDate");
 const ENABLE_USE_REVIEW_TODAY = "1";
 
 
-const create = (newData, createdUserId) => {
+const create = (bodyData, createdUserId) => {
   return new Promise(async (resolve, reject) => {
     const {
       title,
@@ -23,7 +23,7 @@ const create = (newData, createdUserId) => {
       sounds,
       examples,
       topicId
-    } = newData;
+    } = bodyData;
 
     try {
       // Get the first period to determine the next review date
@@ -47,8 +47,6 @@ const create = (newData, createdUserId) => {
         pronounciation,
         definition,
         description,
-        lessonId,
-        topicId,
         images,
         sounds,
         examples,
@@ -56,7 +54,8 @@ const create = (newData, createdUserId) => {
         nextReviewDate
       };
 
-      if (!lessonId) delete newData.lessonId;
+      if (lessonId) newData.lessonId = convertStringToObjectId(lessonId);
+      if (topicId) newData.topicId = convertStringToObjectId(topicId);
 
       const createdData = await Word.create(newData);
 
@@ -201,6 +200,11 @@ const updateOnlyInfoWord = (updatedData = {}, updateId) => {
       delete updatedData.reviewCount;
       delete updatedData.step;
       delete updatedData.reviewHistory;
+
+      const {lessonId, topicId} = updatedData;
+
+      if (lessonId) updatedData.lessonId = convertStringToObjectId(lessonId);
+      if (topicId) updatedData.topicId = convertStringToObjectId(topicId);
 
       // Modify fields
       Object.assign(checkWord, updatedData);

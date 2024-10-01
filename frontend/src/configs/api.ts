@@ -20,4 +20,7 @@ export const API_ENDPOINTS = {
     LESSON: {
         INDEX: `/lessons`,
     },
+    UPLOAD: {
+        SINGLE: `/uploadSingleFile`,
+    },
 };
