@@ -14,7 +14,6 @@ import { Button, Table, TableProps, Tooltip, Typography } from 'antd';
 import {
   EditOutlined,
   CheckOutlined,
-  SoundOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
@@ -23,6 +22,7 @@ import debounce from 'lodash/debounce';
 import { ENABLE_USE_REVIEW, SEARCH_WORD_FIELDS } from '@/configs/words';
 import { readText } from '@/utils';
 import SpeakTextWrapper from '@/components/SpeakTextWrapper';
+import MoreAction from './MoreAction';
 
 interface IReviewProps {
   topicData: TTopicType;
@@ -145,7 +145,9 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
       title: <div>Sentence Hello</div>,
       dataIndex: 'title',
       key: 'title',
-      render: (text) => <SpeakTextWrapper text={text} />,
+      render: (text) => <SpeakTextWrapper text={text}>
+        <Button type='text'>{text}</Button>
+      </SpeakTextWrapper>,
     },
     {
       title: 'Word',
@@ -186,6 +188,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
           <Tooltip title="Review">
             <Button onClick={() => handleReview(record._id)} type='text' icon={<CheckOutlined />} />
           </Tooltip>
+          <MoreAction />
         </div>
       ),
     },

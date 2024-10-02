@@ -7,22 +7,23 @@ import { SoundOutlined } from '@ant-design/icons';
 
 interface ISpeakTextWrapperProps {
   text: string;
+  children?: React.ReactNode;
 }
 
-const SpeakTextWrapper: React.FC<ISpeakTextWrapperProps> = ({text}) => {
+const SpeakTextWrapper: React.FC<ISpeakTextWrapperProps> = ({text, children}) => {
   const handleSpeak = (text: string) => {
     readText(text);
   };
 
   return (
-    <div className="flex items-center justify-between gap-1">
-      <span>{text}</span>
+    <span className="flex items-center justify-between gap-1">
+      {children ? children : <span>{text}</span>}
       <Button
         icon={<SoundOutlined />}
         type="text"
         onClick={() => handleSpeak(text)}
       ></Button>
-    </div>
+    </span>
   );
 };
 
