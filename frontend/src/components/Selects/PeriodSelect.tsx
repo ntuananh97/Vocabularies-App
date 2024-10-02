@@ -4,8 +4,8 @@ import { Select, SelectProps } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 interface IPeriodSelectProps extends SelectProps {
-  onChange: (_value: string) => void;
-  value: string;
+  onChange?: (_value: string) => void;
+  value?: string;
 }
 
 const PeriodSelect: React.FC<IPeriodSelectProps> = ({
@@ -14,7 +14,13 @@ const PeriodSelect: React.FC<IPeriodSelectProps> = ({
   ...props
 }) => {
 
-    const [periods, setPeriods] = useState<SelectProps['options']>([])
+    const [periods, setPeriods] = useState<SelectProps['options']>([]);
+    const [intervalValue, setIntervalValue] = useState("")
+
+    useEffect(() => {
+      if (value !== undefined) setIntervalValue(value);
+    }, [value])
+    
 
     useEffect(() => {
         const  fetchData = async () => {
@@ -34,13 +40,14 @@ const PeriodSelect: React.FC<IPeriodSelectProps> = ({
     
 
   const handleChange = (value: string) => {
-    onChange(value);
+    if (value === undefined) setIntervalValue(value);
+    onChange?.(value);
   };
 
   return (
     <Select
       {...props}
-      value={value}
+      value={intervalValue}
       onChange={handleChange}
       options={periods}
     />

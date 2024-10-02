@@ -14,6 +14,11 @@ const LessonSelect: React.FC<ILessonSelectProps> = ({
   ...props
 }) => {
   const [lessons, setLessons] = useState<SelectProps['options']>([]);
+  const [intervalValue, setIntervalValue] = useState("")
+
+  useEffect(() => {
+    if (value !== undefined) setIntervalValue(value);
+  }, [value])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,13 +35,14 @@ const LessonSelect: React.FC<ILessonSelectProps> = ({
   }, []);
 
   const handleChange = (value: string) => {
+    if (value === undefined) setIntervalValue(value);
     onChange?.(value);
   };
 
   return (
     <Select
       {...props}
-      value={value}
+      value={intervalValue}
       onChange={handleChange}
       options={lessons}
     />

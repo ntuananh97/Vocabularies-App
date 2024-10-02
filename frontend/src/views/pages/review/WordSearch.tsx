@@ -1,45 +1,61 @@
 import { Button, Col, DatePicker, Drawer, Input, InputNumber, InputNumberProps, Row } from 'antd';
-import React, { useId, useState } from 'react';
+import React, { useCallback, useEffect, useId, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { TWordSearchForm } from '@/types/word';
+import { TSearchWordParams, TWordSearchForm } from '@/types/word';
 import SearchComponent from './SearchComponent';
 import PeriodSelect from '@/components/Selects/PeriodSelect';
 import LessonSelect from '@/components/Selects/LessonSelect';
 import { SEARCH_WORD_FIELDS } from '@/configs/words';
 import dayjs, { Dayjs } from 'dayjs';
+import debounce from 'lodash/debounce';
 
 interface IWordSearchProps {
   onChangeFilter: (_filter: TWordSearchForm) => void;
   filter: TWordSearchForm;
+  searchWordParamsFromParent: TSearchWordParams;
 }
+
+const TIME_TO_SEARCH = 300; // ms
 
 const { RangePicker } = DatePicker;
 
-const WordSearch: React.FC<IWordSearchProps> = ({ filter, onChangeFilter }) => {
+const WordSearch: React.FC<IWordSearchProps> = ({ filter, searchWordParamsFromParent , onChangeFilter }) => {
   const [open, setOpen] = useState(false);
   const unique = useId();
 
-  const { keyWord, definition, lessonId, step } = filter;
-
   const getUniqueId = (key: string) => `${key}-${unique}`;
 
-  const handleChangeFilter = (
+  const debouncedSearch = useCallback(
+    debounce(async (newFilter: TWordSearchForm) => {
+      onChangeFilter(newFilter);
+        }, TIME_TO_SEARCH), 
+    [searchWordParamsFromParent]
+  );
+
+  useEffect(() => {
+    // Cleanup the debounce when component unmounts
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch])
+
+  const handleChangeFilterInput = (
     e: React.ChangeEvent<HTMLInputElement>,
     key: string
   ) => {
     const changeValue = { ...filter, [key]: e.target.value };
-    onChangeFilter(changeValue);
+    debouncedSearch(changeValue);
   };
 
   const handleChangeRiewCount: InputNumberProps['onChange'] = (val) => {
     const valWithType = val as TWordSearchForm['reviewCount']
     const changeValue = { ...filter, reviewCount: valWithType };
-    onChangeFilter(changeValue);
+    debouncedSearch(changeValue);
   }
 
   const handleChangeSelect = (val: string, key: string) => {
     const changeValue = { ...filter, [key]: val };
-    onChangeFilter(changeValue);
+    debouncedSearch(changeValue);
   }
 
   const handleChangeRangePicker = (dates: null | (Dayjs | null)[], key: string) => {
@@ -65,16 +81,14 @@ const WordSearch: React.FC<IWordSearchProps> = ({ filter, onChangeFilter }) => {
       <Row gutter={15}>
         <Col span={7}>
           <Input
-            onChange={(e) => handleChangeFilter(e, SEARCH_WORD_FIELDS.KEY_WORD)}
+            onChange={(e) => handleChangeFilterInput(e, SEARCH_WORD_FIELDS.KEY_WORD)}
             placeholder="Seach word"
-            value={keyWord}
           />
         </Col>
         <Col span={7}>
           <Input
-            onChange={(e) => handleChangeFilter(e, SEARCH_WORD_FIELDS.DEFINITION)}
+            onChange={(e) => handleChangeFilterInput(e, SEARCH_WORD_FIELDS.DEFINITION)}
             placeholder="Search definition"
-            value={definition}
           />
         </Col>
         <Col span={7}>
@@ -108,7 +122,7 @@ const WordSearch: React.FC<IWordSearchProps> = ({ filter, onChangeFilter }) => {
         <SearchComponent label="Câu" labelFor={getUniqueId('word-sentence-search-id')}>
           <Input
             id={getUniqueId('word-sentence-search-id')}
-            onChange={(e) => handleChangeFilter(e, SEARCH_WORD_FIELDS.TITLE)}
+            onChange={(e) => handleChangeFilterInput(e, SEARCH_WORD_FIELDS.TITLE)}
             className="w-full"
           />
         </SearchComponent>
@@ -116,7 +130,6 @@ const WordSearch: React.FC<IWordSearchProps> = ({ filter, onChangeFilter }) => {
           <PeriodSelect
             id={getUniqueId('word-period-search-id')}
             className="w-full"
-            value={step?.toString() || ''}
             onChange={(value) =>handleChangeSelect(value, SEARCH_WORD_FIELDS.STEP)}
             allowClear
           />
@@ -125,7 +138,6 @@ const WordSearch: React.FC<IWordSearchProps> = ({ filter, onChangeFilter }) => {
         <LessonSelect
             id={getUniqueId('word-lesson-search-id')}
             className="w-full"
-            value={lessonId}
             onChange={(value) =>handleChangeSelect(value, SEARCH_WORD_FIELDS.LESSON_ID)}
             allowClear
           />

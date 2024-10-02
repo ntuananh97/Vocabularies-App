@@ -10,7 +10,7 @@ import { handleErrorResponse, handleSuccessResponse } from '@/helpers/response';
 import { getWords, markWordAsReviewed } from '@/services/word';
 import { TTopicType } from '@/types/topic';
 import { TSearchWordParams, TWordSearchForm, TWordType } from '@/types/word';
-import { Button, Table, TableProps, Tooltip, Typography } from 'antd';
+import { Button, Switch, Table, TableProps, Tooltip, Typography } from 'antd';
 import {
   EditOutlined,
   CheckOutlined,
@@ -18,17 +18,13 @@ import {
 import dayjs from 'dayjs';
 import React, { useEffect, useState } from 'react';
 import WordSearch from './WordSearch';
-import debounce from 'lodash/debounce';
-import { ENABLE_USE_REVIEW, SEARCH_WORD_FIELDS } from '@/configs/words';
-import { readText } from '@/utils';
+import { ENABLE_USE_REVIEW, UN_ENABLE_USE_REVIEW } from '@/configs/words';
 import SpeakTextWrapper from '@/components/SpeakTextWrapper';
 import MoreAction from './MoreAction';
 
 interface IReviewProps {
   topicData: TTopicType;
 }
-
-const TIME_TO_SEARCH = 300; // ms
 
 const { Title } = Typography;
 const inititalEditData = {} as TWordType;
@@ -64,6 +60,10 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
     setLoading(true);
 
     const newFilter = searchParams?.filter || filter;
+    const newUseReviewToday = searchParams?.useReviewToday || params.useReviewToday;
+    const newPage = searchParams?.page || params.page;
+    const newPageSize = searchParams?.pageSize || params.pageSize;
+    const newSort = searchParams?.sort || params.sort;
 
     // remove empty fields
     Object.keys(newFilter).forEach((key) => {
@@ -78,12 +78,17 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
     });
 
     const newParams = {
-      ...params,
+      page: newPage,
+      pageSize: newPageSize,
+      sort: newSort,
       filter: JSON.stringify({
         ...newFilter,
         topicId,
       }),
+      useReviewToday: newUseReviewToday,
     };
+
+    if (newUseReviewToday !== ENABLE_USE_REVIEW) delete newParams.useReviewToday;
 
     try {
       const response = await getWords(newParams);
@@ -97,13 +102,6 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
     setLoading(false);
   };
 
-  const debouncedSearch = React.useRef(
-    debounce(async (newFilter: TWordSearchForm) => {
-      fetchData({
-        filter: newFilter
-      });
-    }, TIME_TO_SEARCH)
-  ).current;
 
   const handleFetchData = () => {
     fetchData();
@@ -111,11 +109,8 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
 
   useEffect(() => {
     handleFetchData();
+  }, []);
 
-    return () => {
-      debouncedSearch.cancel();
-    };
-  }, [debouncedSearch]);
 
   const openWordModal = (item?: TWordType) => {
     setIsOpenWordModal(true);
@@ -124,10 +119,8 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
 
 
   const handleChangeFilter = (newFilter: TWordSearchForm) => {
+    fetchData({ filter: newFilter });
     setFilter(newFilter);
-    console.log('run handleChangeFilter:', newFilter);
-
-    debouncedSearch(newFilter);
   };
 
   const handleReview = async (wordId: string) => {
@@ -139,6 +132,20 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
       handleErrorResponse(error);
     }
   }
+
+  const showReviewWordsOrAllWords = (checked: boolean) => {
+    if (loading) return;
+
+    const newUseReviewToday = checked ? ENABLE_USE_REVIEW : UN_ENABLE_USE_REVIEW;
+    setParams({
+      ...params,
+      useReviewToday: newUseReviewToday,
+    });
+
+    fetchData({useReviewToday: newUseReviewToday});
+  }
+
+  const checked = params.useReviewToday === ENABLE_USE_REVIEW;
 
   const columns: TableProps<TWordType>['columns'] = [
     {
@@ -196,13 +203,20 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
 
   return (
     <div>
-      <div className="flex justify-between items-center">
-        <Title level={2}>{topicData.name}</Title>
+      <div className="flex justify-between items-center mb-3">
+        <div className='flex items-center gap-2'>
+          <Title style={{marginBottom: 0}} level={2}>{topicData.name}</Title>
+
+          <div className='flex items-center gap-1'>
+            <Switch onChange={showReviewWordsOrAllWords} checked={checked} />
+            <span>{checked ? 'Words to review today' : 'All words'}</span>
+          </div>
+        </div>
         <Button type='primary' onClick={() => openWordModal()}>Add Word</Button>
       </div>
 
       <div className="mb-5">
-        <WordSearch filter={filter} onChangeFilter={handleChangeFilter} />
+        <WordSearch searchWordParamsFromParent={params}  filter={filter} onChangeFilter={handleChangeFilter} />
       </div>
 
       <Table<TWordType>
