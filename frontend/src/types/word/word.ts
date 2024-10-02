@@ -1,6 +1,7 @@
 import { Dayjs } from "dayjs";
 import { ENABLE_USE_REVIEW } from '../../configs/words';
 import { TFileListType } from "@/components/UploadFile/UploadFile";
+import { TInputListType } from "@/components/FormList/FormList";
 
 export type TDatePickerValue = Dayjs | undefined
 
@@ -48,6 +49,7 @@ export type TApiSearchWordParams = TSearchWordParams & {
 
 export type TWordFormDataType = Partial<TWordType> & {
   localImages?: TFileListType[];
+  localExamples?: TInputListType[];
 }
 
 

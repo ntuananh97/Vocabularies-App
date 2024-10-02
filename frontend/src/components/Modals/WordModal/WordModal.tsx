@@ -1,11 +1,11 @@
+import FormList from '@/components/FormList';
 import LessonSelect from '@/components/Selects/LessonSelect';
 import UploadFile from '@/components/UploadFile';
 import { handleErrorResponse, handleSuccessResponse } from '@/helpers/response';
-import { createNewTopic, updateTopic } from '@/services/topic';
 import { createNewWord, updateWord } from '@/services/word';
 import { TWordFormDataType, TWordType } from '@/types/word';
 import { generateUniqueId, trimStringValue } from '@/utils';
-import { Modal, Form, Input, Row, Col } from 'antd';
+import { Modal, Form, Input, Row, Col, Space, Button } from 'antd';
 import { useEffect, useState } from 'react';
 
 type TWordModal = {
@@ -31,7 +31,8 @@ const WordModal: React.FC<TWordModal> = ({
     if (visible) {
       console.log('editData:', editData);
       const localImages = editData.images?.map((url) => ({ id: generateUniqueId(), url })) || [];
-      
+      const localExamples = editData.examples?.map((example) => ({ id: generateUniqueId(), value: example })) || [];
+
       form.setFieldsValue({
         title: editData.title,
         keyWord: editData.keyWord,
@@ -40,7 +41,7 @@ const WordModal: React.FC<TWordModal> = ({
         description: editData.description,
         lessonId: editData.lessonId,
         localImages,
-        examples: editData.examples,
+        localExamples,
       });
     }
   }, [visible, isEdit, editData, form]);
@@ -49,6 +50,7 @@ const WordModal: React.FC<TWordModal> = ({
     console.log('createOrUpdateTopic ~ values:', values);
 
     const images = values.localImages?.map((image) => image.url) || [];
+    const examples = values.localExamples?.map((item) => item.value) || [];
 
     const payload = {
       title: trimStringValue(values.title),
@@ -58,7 +60,8 @@ const WordModal: React.FC<TWordModal> = ({
       description: trimStringValue(values.description),
       lessonId: values.lessonId,
       topicId,
-      images
+      images,
+      examples
     };
 
     setLoading(true);
@@ -104,7 +107,7 @@ const WordModal: React.FC<TWordModal> = ({
             description: '',
             lessonId: '',
             localImages: [],
-            examples: '',
+            localExamples: [],
           }}
         >
           {dom}
@@ -164,8 +167,8 @@ const WordModal: React.FC<TWordModal> = ({
           </Form.Item>
         </Col>
         <Col span={24}>
-          <Form.Item<TWordFormDataType> label="Examples" name="examples">
-            <Input />
+          <Form.Item<TWordFormDataType> label="Examples" name="localExamples">
+            <FormList />
           </Form.Item>
         </Col>
       </Row>
