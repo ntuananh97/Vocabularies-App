@@ -108,9 +108,28 @@ const markAsReviewed = async (req, res) => {
   }
 };
 
+const getDetailWord = async (req, res) => {
+  try {
+    const updateId = req.params.id;
+
+    const response = await WordService.getDetailWord(updateId);
+    const { data, status, typeError, message, statusMessage } = response;
+
+    return res.status(status).json({
+      typeError,
+      data,
+      message,
+      status: statusMessage,
+    });
+  } catch {
+    return returnInternalErrorResponse(res);
+  }
+};
+
 module.exports = {
   createWord,
   getWords,
   updateOnlyInfoWord,
-  markAsReviewed
+  markAsReviewed,
+  getDetailWord
 };

@@ -21,23 +21,25 @@ import WordSearch from './WordSearch';
 import { ENABLE_USE_REVIEW, UN_ENABLE_USE_REVIEW } from '@/configs/words';
 import SpeakTextWrapper from '@/components/SpeakTextWrapper';
 import MoreAction from './MoreAction';
+import WordInfoModal from '@/components/Modals/WordModal/WordInfoModal';
 
 interface IReviewProps {
   topicData: TTopicType;
 }
 
 const { Title } = Typography;
-const inititalEditData = {} as TWordType;
+export const initialEditWordData = {} as TWordType;
 
 const Review: React.FC<IReviewProps> = ({ topicData }) => {
   const topicId = topicData._id;
 
   const [isOpenWordModal, setIsOpenWordModal] = useState(false);
+  const [isOpenWordInfoModal, setIsOpenWordInfoModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [reviewWords, setReviewWords] = useState<TWordType[]>([]);
 
   const [editTopicData, setEditTopicData] =
-    useState<TWordType>(inititalEditData);
+    useState<TWordType>(initialEditWordData);
   const [pagination, setPagination] = useState<{
     current: number;
     total: number;
@@ -114,7 +116,12 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
 
   const openWordModal = (item?: TWordType) => {
     setIsOpenWordModal(true);
-    setEditTopicData(item || inititalEditData);
+    setEditTopicData(item || initialEditWordData);
+  };
+
+  const openWordInfoModal = (item?: TWordType) => {
+    setIsOpenWordInfoModal(true);
+    setEditTopicData(item || initialEditWordData);
   };
 
 
@@ -152,20 +159,20 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
       title: <div>Sentence Hello</div>,
       dataIndex: 'title',
       key: 'title',
-      render: (text) => <SpeakTextWrapper text={text}>
-        <Button type='text'>{text}</Button>
-      </SpeakTextWrapper>,
+      render: (text, item) => <SpeakTextWrapper text={text} className='justify-between'>
+      <Button onClick={() => openWordInfoModal(item)} type="text">{text}</Button>
+    </SpeakTextWrapper>,
     },
     {
       title: 'Word',
       dataIndex: 'keyWord',
       key: 'keyWord',
-      render: (text) => <SpeakTextWrapper text={text} />,
+      render: (text) => <SpeakTextWrapper text={text} className='justify-between' />,
 
     },
 
     {
-      title: 'Pronounciation',
+      title: 'Pronunciation',
       dataIndex: 'pronounciation',
       key: 'pronounciation',
     },
@@ -232,6 +239,11 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
         editData={editTopicData}
         onRefreshData={handleFetchData}
         topicId={topicId}
+      />
+      <WordInfoModal
+        visible={isOpenWordInfoModal}
+        onCancel={() => setIsOpenWordInfoModal(false)}
+        editData={editTopicData}
       />
     </div>
   );

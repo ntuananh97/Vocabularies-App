@@ -284,9 +284,44 @@ const markAsReviewed = (updateId) => {
   });
 };
 
+const getDetailWord = (updateId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Check if the word is existed
+      const wordInfo = await Word.findById(updateId).populate("lessonId");
+      if (!wordInfo) {
+        resolve({
+          status: CONFIG_MESSAGE_ERRORS.INVALID.status,
+          message: "The word is not existed",
+          typeError: CONFIG_MESSAGE_ERRORS.INVALID.type,
+          data: null,
+          statusMessage: "Error",
+        });
+        return;
+      }
+
+      // keep lessonId and populate value to lesson
+      if (wordInfo.lessonId) {
+        wordInfo.lesson = wordInfo.lessonId;
+      }
+
+      return resolve({
+        status: CONFIG_MESSAGE_ERRORS.ACTION_SUCCESS.status,
+        message: "updated successfully",
+        typeError: "",
+        data: wordInfo,
+        statusMessage: "Success",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   create,
   getWords,
   updateOnlyInfoWord,
-  markAsReviewed
+  markAsReviewed,
+  getDetailWord
 };

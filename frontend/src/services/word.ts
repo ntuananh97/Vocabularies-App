@@ -41,4 +41,11 @@ export const markWordAsReviewed = async (updatedId: string) => {
   }
 };
 
-
+export const getDetailWord = async (updatedId: string) => {
+  try {
+    const res = await axiosInstance.get(`${API_ENDPOINTS.WORD.INDEX}/${updatedId}`);
+    return res.data;
+  } catch (error) {
+    handleAxiosError(error);
+  }
+};
