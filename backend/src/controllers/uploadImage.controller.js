@@ -7,7 +7,7 @@ const {
 } = require("../utils/returnResponse");
 const { getOriginalFileNameFromFileName } = require("../utils/handleFile");
 
-const uploadImage = async (req, res) => {
+const uploadSingleFile = async (req, res) => {
   try {
 
     if (!req.files || Object.keys(req.files).length === 0) {
@@ -56,5 +56,5 @@ const uploadImage = async (req, res) => {
 };
 
 module.exports = {
-  uploadImage,
+  uploadSingleFile,
 };

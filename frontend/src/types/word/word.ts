@@ -1,5 +1,8 @@
 import { Dayjs } from "dayjs";
-import { ENABLE_USE_REVIEW } from '../../configs/words';
+import { ENABLE_USE_REVIEW, UN_ENABLE_USE_REVIEW } from '../../configs/words';
+import { TFileListType } from "@/components/UploadFile/UploadFile";
+import { TInputListType } from "@/components/FormList/FormList";
+import { TLessonType } from "../lesson";
 
 export type TDatePickerValue = Dayjs | undefined
 
@@ -16,12 +19,13 @@ export type TWordType = {
   reviewCount: number;
   step: number;
   nextReviewDate: string;
-  reviewHistory: string[];
+  reviewHistory: {reviewDate: string, step: number}[];
   lessonId: string;
   topicId: string;
   userId: string;
   createdAt: string;
   updatedAt: string;
+  lesson?: TLessonType;
 };
 
 
@@ -35,7 +39,7 @@ export type TWordSearchForm = TWordType & {
 export type TSearchWordParams = {
   filter?: Partial<TWordSearchForm>;
   topicId?: string
-  useReviewToday?: typeof ENABLE_USE_REVIEW
+  useReviewToday?: typeof  ENABLE_USE_REVIEW | typeof UN_ENABLE_USE_REVIEW
   page?: number
   pageSize?: number
   sort?: string
@@ -44,5 +48,10 @@ export type TSearchWordParams = {
 export type TApiSearchWordParams = TSearchWordParams & {
   filter?: string;
 };
+
+export type TWordFormDataType = Partial<TWordType> & {
+  localImages?: TFileListType[];
+  localExamples?: TInputListType[];
+}
 
 

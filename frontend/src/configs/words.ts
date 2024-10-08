@@ -1,4 +1,5 @@
 export const ENABLE_USE_REVIEW = "1";
+export const UN_ENABLE_USE_REVIEW = "0";
 
 export const SEARCH_WORD_FIELDS = {
     KEY_WORD: 'keyWord',

@@ -10,7 +10,7 @@ const { getDateQuery } = require("../utils/convertDate");
 const ENABLE_USE_REVIEW_TODAY = "1";
 
 
-const create = (newData, createdUserId) => {
+const create = (bodyData, createdUserId) => {
   return new Promise(async (resolve, reject) => {
     const {
       title,
@@ -23,7 +23,7 @@ const create = (newData, createdUserId) => {
       sounds,
       examples,
       topicId
-    } = newData;
+    } = bodyData;
 
     try {
       // Get the first period to determine the next review date
@@ -47,14 +47,15 @@ const create = (newData, createdUserId) => {
         pronounciation,
         definition,
         description,
-        lessonId,
-        topicId,
         images,
         sounds,
         examples,
         userId: createdUserId,
         nextReviewDate
       };
+
+      if (lessonId) newData.lessonId = convertStringToObjectId(lessonId);
+      if (topicId) newData.topicId = convertStringToObjectId(topicId);
 
       const createdData = await Word.create(newData);
 
@@ -200,6 +201,11 @@ const updateOnlyInfoWord = (updatedData = {}, updateId) => {
       delete updatedData.step;
       delete updatedData.reviewHistory;
 
+      const {lessonId, topicId} = updatedData;
+
+      if (lessonId) updatedData.lessonId = convertStringToObjectId(lessonId);
+      if (topicId) updatedData.topicId = convertStringToObjectId(topicId);
+
       // Modify fields
       Object.assign(checkWord, updatedData);
       // Save the updated document
@@ -278,9 +284,44 @@ const markAsReviewed = (updateId) => {
   });
 };
 
+const getDetailWord = (updateId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Check if the word is existed
+      const wordInfo = await Word.findById(updateId).populate("lessonId");
+      if (!wordInfo) {
+        resolve({
+          status: CONFIG_MESSAGE_ERRORS.INVALID.status,
+          message: "The word is not existed",
+          typeError: CONFIG_MESSAGE_ERRORS.INVALID.type,
+          data: null,
+          statusMessage: "Error",
+        });
+        return;
+      }
+
+      // keep lessonId and populate value to lesson
+      if (wordInfo.lessonId) {
+        wordInfo.lesson = wordInfo.lessonId;
+      }
+
+      return resolve({
+        status: CONFIG_MESSAGE_ERRORS.ACTION_SUCCESS.status,
+        message: "updated successfully",
+        typeError: "",
+        data: wordInfo,
+        statusMessage: "Success",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   create,
   getWords,
   updateOnlyInfoWord,
-  markAsReviewed
+  markAsReviewed,
+  getDetailWord
 };

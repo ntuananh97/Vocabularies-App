@@ -24,11 +24,11 @@ const TopicModal: React.FC<TTopicModal> = ({ visible, onCancel, editData }) => {
       });
     }
   }, [visible, isEdit, editData, form]);
-  
+
 
 
   const createOrUpdateTopic = async (values: TTopicFormData) => {
-    
+
     const payload = {
       name: values.name.trim(),
     };
@@ -38,12 +38,12 @@ const TopicModal: React.FC<TTopicModal> = ({ visible, onCancel, editData }) => {
       isEdit ? await updateTopic(editData._id, payload) : await createNewTopic(payload);
       getAllTopics();
       handleSuccessResponse(`Topic ${isEdit ? 'updated' : 'created'} successfully`);
+      handleCancel();
     } catch (error) {
       handleErrorResponse(error);
     }
     setLoading(false);
 
-    handleCancel();
   };
 
   const handleCancel = () => {

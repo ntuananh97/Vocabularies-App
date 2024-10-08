@@ -6,6 +6,7 @@ import { ROUTE_CONFIG } from '@/configs/route';
 import { getMe } from '@/services/auth';
 import { TUser } from '@/types/auth';
 import '@/configs/dayjs-config';
+import { Spin } from 'antd';
 
 type TUserContext = TUser | null;
 
@@ -34,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setStatus(true)
         const  response = await getMe();
         const userData = response.data;
-        
+
         setUser(userData);
       } catch {
         setUser(null);
@@ -51,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = (userData: TUser) => {
     setUser(userData);
     router.push(ROUTE_CONFIG.TOPIC);
-   
+
   };
 
   const logout = () => {
@@ -61,7 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ status, user, login, logout }}>
-      {children}
+      {status ? <div className='flex justify-center'><Spin spinning={status} /></div> : children}
     </AuthContext.Provider>
   );
 };
