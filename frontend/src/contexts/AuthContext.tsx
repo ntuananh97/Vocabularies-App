@@ -7,6 +7,7 @@ import { getMe } from '@/services/auth';
 import { TUser } from '@/types/auth';
 import '@/configs/dayjs-config';
 import { Spin } from 'antd';
+import axiosInstance from '@/helpers/axios';
 
 type TUserContext = TUser | null;
 
@@ -29,6 +30,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const router = useRouter();
 
   useEffect(() => {
+    // write request with axios
+    axiosInstance.get('/hello').then((response) => {
+      console.log("axiosInstance.get ~ response:", response)
+
+    }).catch((error) => {
+    console.log("useEffect ~ error:", error)
+
+    });
+
+
     // Check if user is logged in
     const checkUser = async () => {
       try {
