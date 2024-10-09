@@ -28,7 +28,7 @@ const generateTokenAndSetCookie = (payload, res) => {
     httpOnly: true,
     secure: checkProduction() ? true : false,
     maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
-    sameSite: "none",
+    sameSite: "None",
   });
 };
 
