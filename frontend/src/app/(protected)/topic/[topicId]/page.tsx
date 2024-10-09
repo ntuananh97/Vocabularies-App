@@ -19,7 +19,9 @@ export default async function ReviewPage  ({ params }: IReviewPage) {
     headers: { Cookie: cookies().toString() },
   })
   const response = await data.json();
+  console.log("ReviewPage ~ response:", response)
   const topicData = response.data || {};
+  console.log("ReviewPage ~ topicData:", topicData)
 
   return (
     <div>
