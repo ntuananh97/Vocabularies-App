@@ -1,4 +1,6 @@
 const { default: mongoose } = require("mongoose");
+const process = require("process"); // Add this line to import the 'process' module
+require("dotenv").config();
 
 // Only validate the string fields that are required
 const validateRequiredInput = (data, arrRequired) => {
@@ -27,9 +29,12 @@ const convertStringToObjectId = (str) => {
   return newString
 };
 
+const checkProduction = () => process.env.NODE_ENV === "production";
+
 
 module.exports = {
   validateRequiredInput,
   checkEmptyRequiredFields,
-  convertStringToObjectId
+  convertStringToObjectId,
+  checkProduction
 };

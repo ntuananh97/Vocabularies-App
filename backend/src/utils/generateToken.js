@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const process = require("process");
 const { TOKEN_NAME } = require("../configs/constants");
+const { checkProduction } = require("../utils");
 
 
 const generateAuthToken = (payload = {}) => {
@@ -25,9 +26,9 @@ const generateTokenAndSetCookie = (payload, res) => {
   
   res.cookie(TOKEN_NAME, token, {
     httpOnly: true,
-    secure: false,
+    secure: checkProduction() ? true : false,
     maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
-    sameSite: "strict",
+    sameSite: "none",
   });
 };
 
