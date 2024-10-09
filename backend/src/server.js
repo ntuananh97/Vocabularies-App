@@ -7,7 +7,6 @@ const bodyParser = require("body-parser");
 const connectDb = require("./configs/connectDb");
 require("./configs/dayjsConfig");
 const routes = require("./routes");
-const integrateSwagger = require("./configs/swaggerConfig");
 const fileUpload = require('express-fileupload');
 const process = require("process"); // Add this line to import the 'process' module
 
@@ -34,12 +33,11 @@ app.use(fileUpload(
 
 // config data
 app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(bodyParser.json());
 
 routes(app);
 
-integrateSwagger(app);
 
 // start app
 const port = process.env.PORT || 3001;
