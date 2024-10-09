@@ -44,7 +44,7 @@ const port = process.env.PORT || 3001;
 
 const startApp = () => {
     server.listen(port, () => {
-        console.log("Server is running in port: " + `http://localhost:${port}`);
+        console.log("Server is running in port: " + `http://localhost:${port}` + " cors🚀" + process.env.FRONTEND_URL);
     });
 }
 
