@@ -17,12 +17,15 @@ dotenv.config();
 
 // Configure CORS
 app.use(cors({
-    origin: process.env.FRONTEND_URL | 'http://localhost:3000', // Specify the frontend domain
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Specify the frontend domain
     credentials: true, // Allow sending cookies with requests
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow the request methods
-    allowedHeaders: ['Content-Type', 'Authorization'] // Allow the headers
 }));
-console.log(" process.env.FRONTEND_URL:",  process.env.FRONTEND_URL)
+console.log(" process.env.FRONTEND_URL:", {
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Specify the frontend domain
+    credentials: true, // Allow sending cookies with requests
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow the request methods
+})
   
 
 // Cookie parser
