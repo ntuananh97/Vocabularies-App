@@ -9,6 +9,7 @@ require("./configs/dayjsConfig");
 const routes = require("./routes");
 const fileUpload = require('express-fileupload');
 const process = require("process"); // Add this line to import the 'process' module
+const corsOptions = require("./configs/corsConfig");
 
 const app = express();
 const server = http.createServer(app) // thiết lập socket io cho sau này
@@ -16,16 +17,8 @@ const server = http.createServer(app) // thiết lập socket io cho sau này
 dotenv.config();
 
 // Configure CORS
-app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Specify the frontend domain
-    credentials: true, // Allow sending cookies with requests
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow the request methods
-}));
-console.log(" process.env.FRONTEND_URL:", {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Specify the frontend domain
-    credentials: true, // Allow sending cookies with requests
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow the request methods
-})
+app.use(cors(corsOptions));
+
   
 
 // Cookie parser
