@@ -17,7 +17,7 @@ dotenv.config();
 
 // Configure CORS
 app.use(cors({
-    origin: 'http://localhost:3000', // Specify the frontend domain
+    origin: process.env.FRONTEND_URL | 'http://localhost:3000', // Specify the frontend domain
     credentials: true, // Allow sending cookies with requests
 }));
 
