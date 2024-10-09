@@ -16,12 +16,15 @@ const server = http.createServer(app); // thiết lập socket io cho sau này
 dotenv.config();
 
 // Configure CORS
-app.use(cors({
-    origin: process.env.FRONTEND_URL | 'http://localhost:3000', // Specify the frontend domain
-    credentials: true, // Allow sending cookies with requests
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow the request methods
-    allowedHeaders: ['Content-Type', 'Authorization'] // Allow the headers
-}));
+// app.use(cors({
+//     origin: process.env.FRONTEND_URL | 'http://localhost:3000', // Specify the frontend domain
+//     credentials: true, // Allow sending cookies with requests
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow the request methods
+//     allowedHeaders: ['Content-Type', 'Authorization'] // Allow the headers
+// }));
+
+app.use(cors()); // Cho phép tất cả các nguồn
+
 
 // Cookie parser
 app.use(cookieParser());
