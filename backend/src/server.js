@@ -19,6 +19,8 @@ dotenv.config();
 app.use(cors({
     origin: process.env.FRONTEND_URL | 'http://localhost:3000', // Specify the frontend domain
     credentials: true, // Allow sending cookies with requests
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow the request methods
+    allowedHeaders: ['Content-Type', 'Authorization'] // Allow the headers
 }));
 
 // Cookie parser
