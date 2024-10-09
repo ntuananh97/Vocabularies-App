@@ -23,12 +23,20 @@ const generateAuthToken = (payload = {}) => {
  */
 const generateTokenAndSetCookie = (payload, res) => {
   const token = generateAuthToken(payload);
+
+  console.log('generateTokenAndSetCookie ~ token:', {
+    httpOnly: true,
+    secure: checkProduction() ? true : false,
+    maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
+    sameSite:  checkProduction() ? "None" : "Strict",
+  });
+  
   
   res.cookie(TOKEN_NAME, token, {
     httpOnly: true,
     secure: checkProduction() ? true : false,
     maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
-    sameSite: "None",
+    sameSite: checkProduction() ? "None" : "Strict",
   });
 };
 
