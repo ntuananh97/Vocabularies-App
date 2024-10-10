@@ -17,6 +17,7 @@ export default async function ReviewPage  ({ params }: IReviewPage) {
 
   const data = await fetch(`${BASE_URL}${API_ENDPOINTS.TOPIC.INDEX}/${params.topicId}`, {
     headers: { Cookie: cookies().toString() },
+    credentials: 'include',
   })
   const response = await data.json();
   console.log("ReviewPage ~ response:", response)
