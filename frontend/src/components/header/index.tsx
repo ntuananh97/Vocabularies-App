@@ -1,6 +1,6 @@
 'use client';
 import { UserOutlined, MenuOutlined } from '@ant-design/icons';
-import { Drawer, Dropdown, Grid, Layout, MenuProps, theme } from 'antd';
+import { Dropdown, Grid, Layout, MenuProps, theme } from 'antd';
 
 const { Header } = Layout;
 
@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import useLogout from '@/hooks/useLogout';
 import SiderMenu from '../SiderMenu';
 import { useState } from 'react';
+import CustomAntdDrawer from '../CustomAntdDrawer';
 
 const MENU_KEYS = {
   PROFILE: '2',
@@ -73,7 +74,7 @@ export const HeaderComponent = () => {
           </Dropdown>
       </Header>
 
-      <Drawer
+      <CustomAntdDrawer
         placement="left"
         onClose={() => setOpen(false)}
         open={open}
@@ -82,7 +83,7 @@ export const HeaderComponent = () => {
         width="50%"
       >
         <SiderMenu />
-      </Drawer>
+      </CustomAntdDrawer>
     </>
   );
 };

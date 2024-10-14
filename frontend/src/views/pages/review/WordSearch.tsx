@@ -1,4 +1,4 @@
-import { Button, Col, DatePicker, Drawer, Grid, Input, InputNumber, InputNumberProps, Row } from 'antd';
+import { Button, Col, DatePicker, Grid, Input, InputNumber, InputNumberProps, Row } from 'antd';
 import React, { useCallback, useEffect, useId, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { TSearchWordParams, TWordSearchForm } from '@/types/word';
@@ -8,6 +8,7 @@ import LessonSelect from '@/components/Selects/LessonSelect';
 import { SEARCH_WORD_FIELDS } from '@/configs/words';
 import dayjs, { Dayjs } from 'dayjs';
 import debounce from 'lodash/debounce';
+import CustomAntdDrawer from '@/components/CustomAntdDrawer';
 
 interface IWordSearchProps {
   onChangeFilter: (_filter: TWordSearchForm) => void;
@@ -120,7 +121,7 @@ const WordSearch: React.FC<IWordSearchProps> = ({ filter, searchWordParamsFromPa
           </Button>
         </Col>
       </Row>
-      <Drawer title="Basic Drawer" onClose={onClose} open={open}>
+      <CustomAntdDrawer title="Basic Drawer" onClose={onClose} open={open}>
         {!lgBreakpoint && (<>
           <SearchComponent label="Definition" labelFor={getUniqueId('word-definition-search-id')}>
             {searchDefinitionInput}
@@ -162,7 +163,7 @@ const WordSearch: React.FC<IWordSearchProps> = ({ filter, searchWordParamsFromPa
             allowClear
           />
         </SearchComponent>
-      </Drawer>
+      </CustomAntdDrawer>
     </>
   );
 };
