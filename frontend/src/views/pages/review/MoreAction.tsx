@@ -21,11 +21,11 @@ const MoreAction = () => {
 
   return (
     <>
-      <Dropdown.Button menu={{ items, onClick: handleClickMenus }}>
+      <Dropdown menu={{ items, onClick: handleClickMenus }}>
         <Tooltip title="More actions">
           <MoreOutlined />
         </Tooltip>
-      </Dropdown.Button>
+      </Dropdown>
     </>
   );
 };

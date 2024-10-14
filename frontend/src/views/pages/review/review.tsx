@@ -28,7 +28,7 @@ interface IReviewProps {
 }
 
 const { Title } = Typography;
-export const initialEditWordData = {} as TWordType;
+const initialEditWordData = {} as TWordType;
 
 const Review: React.FC<IReviewProps> = ({ topicData }) => {
   const topicId = topicData._id;
@@ -156,9 +156,10 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
 
   const columns: TableProps<TWordType>['columns'] = [
     {
-      title: <div>Sentence Hello</div>,
+      title: 'Sentence',
       dataIndex: 'title',
       key: 'title',
+      fixed: 'left',
       render: (text, item) => <SpeakTextWrapper text={text} className='justify-between'>
       <Button onClick={() => openWordInfoModal(item)} type="text">{text}</Button>
     </SpeakTextWrapper>,
@@ -210,8 +211,8 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-3">
-        <div className='flex items-center gap-2'>
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-3 gap-3">
+        <div className='flex flex-col lg:flex-row lg:items-center gap-2'>
           <Title style={{marginBottom: 0}} level={2}>{topicData.name}</Title>
 
           <div className='flex items-center gap-1'>
@@ -231,6 +232,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
         dataSource={reviewWords}
         rowKey="_id"
         loading={loading}
+        scroll={{ x: 'max-content' }}
       />
 
       <WordModal

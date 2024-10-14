@@ -1,4 +1,4 @@
-import { Button, Col, DatePicker, Drawer, Input, InputNumber, InputNumberProps, Row } from 'antd';
+import { Button, Col, DatePicker, Drawer, Grid, Input, InputNumber, InputNumberProps, Row } from 'antd';
 import React, { useCallback, useEffect, useId, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { TSearchWordParams, TWordSearchForm } from '@/types/word';
@@ -17,18 +17,20 @@ interface IWordSearchProps {
 
 const TIME_TO_SEARCH = 300; // ms
 
+const { useBreakpoint } = Grid;
 const { RangePicker } = DatePicker;
 
 const WordSearch: React.FC<IWordSearchProps> = ({ filter, searchWordParamsFromParent , onChangeFilter }) => {
   const [open, setOpen] = useState(false);
   const unique = useId();
+  const {lg: lgBreakpoint} = useBreakpoint();
 
   const getUniqueId = (key: string) => `${key}-${unique}`;
 
   const debouncedSearch = useCallback(
     debounce(async (newFilter: TWordSearchForm) => {
       onChangeFilter(newFilter);
-        }, TIME_TO_SEARCH), 
+        }, TIME_TO_SEARCH),
     [searchWordParamsFromParent]
   );
 
@@ -76,29 +78,38 @@ const WordSearch: React.FC<IWordSearchProps> = ({ filter, searchWordParamsFromPa
     setOpen(false);
   };
 
+  const searchDefinitionInput = <Input
+    onChange={(e) => handleChangeFilterInput(e, SEARCH_WORD_FIELDS.DEFINITION)}
+    placeholder="Search definition"
+  />
+
+  const rangerPickerCreateAtDate = <RangePicker
+  className="w-full"
+  placeholder={['Start date', 'End Date']}
+  onChange={(value) => handleChangeRangePicker(value, SEARCH_WORD_FIELDS.CREATED_AT)}
+/>
+
   return (
     <>
       <Row gutter={15}>
-        <Col span={7}>
+        <Col xs={16} lg={7}>
           <Input
             onChange={(e) => handleChangeFilterInput(e, SEARCH_WORD_FIELDS.KEY_WORD)}
-            placeholder="Seach word"
+            placeholder="Search word"
           />
         </Col>
-        <Col span={7}>
-          <Input
-            onChange={(e) => handleChangeFilterInput(e, SEARCH_WORD_FIELDS.DEFINITION)}
-            placeholder="Search definition"
-          />
-        </Col>
-        <Col span={7}>
-          <RangePicker
-            className="w-full"
-            placeholder={['Start date', 'End Date']}
-            onChange={(value) => handleChangeRangePicker(value, SEARCH_WORD_FIELDS.CREATED_AT)}
-          />
-        </Col>
-        <Col span={3}>
+        { lgBreakpoint && (
+          <>
+            <Col lg={7}>
+              {searchDefinitionInput}
+            </Col>
+            <Col lg={7}>
+              {rangerPickerCreateAtDate}
+            </Col>
+          </>
+        ) }
+
+        <Col xs={8} lg={3}>
           <Button
             onClick={showDrawer}
             type="primary"
@@ -110,6 +121,15 @@ const WordSearch: React.FC<IWordSearchProps> = ({ filter, searchWordParamsFromPa
         </Col>
       </Row>
       <Drawer title="Basic Drawer" onClose={onClose} open={open}>
+        {!lgBreakpoint && (<>
+          <SearchComponent label="Definition" labelFor={getUniqueId('word-definition-search-id')}>
+            {searchDefinitionInput}
+          </SearchComponent>
+          <SearchComponent label="Created Date" labelFor={getUniqueId('word-created-date-search-id')}>
+            {rangerPickerCreateAtDate}
+          </SearchComponent>
+
+        </>)}
         <SearchComponent label="Số lần review" labelFor={getUniqueId('word-review-count-search-id')}>
           <InputNumber<number>
             id={getUniqueId('word-review-count-search-id')}

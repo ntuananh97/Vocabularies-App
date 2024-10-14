@@ -20,9 +20,7 @@ export default async function ReviewPage  ({ params }: IReviewPage) {
     credentials: 'include',
   })
   const response = await data.json();
-  console.log("ReviewPage ~ response:", response)
   const topicData = response.data || {};
-  console.log("ReviewPage ~ topicData:", topicData)
 
   return (
     <div>
