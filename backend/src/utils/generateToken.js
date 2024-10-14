@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const process = require("process");
 const { TOKEN_NAME } = require("../configs/constants");
 const { checkProduction } = require("../utils");
+const { DOMAIN } = require("../configs/appConfig");
 
 
 const generateAuthToken = (payload = {}) => {
@@ -23,15 +24,17 @@ const generateAuthToken = (payload = {}) => {
  */
 const generateTokenAndSetCookie = (payload, res) => {
   const token = generateAuthToken(payload);
-
-  res.cookie(TOKEN_NAME, token, {
-    domain: '.myanki.xyz',
+  const options = {
     httpOnly: true,
     secure: checkProduction() ? true : false,
     maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
     sameSite: checkProduction() ? "None" : "Strict",
     path: "/",
-  });
+  }
+
+  if (checkProduction()) options.domain = DOMAIN.PRODUCTION;
+
+  res.cookie(TOKEN_NAME, token, options);
 };
 
 module.exports = {

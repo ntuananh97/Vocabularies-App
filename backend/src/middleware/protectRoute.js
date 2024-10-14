@@ -12,7 +12,6 @@ const protectRoute = async (req, res, next) => {
   try {
     // Get token from cookie and check if it exists
     const token = req.cookies[TOKEN_NAME];
-    console.log("protectRoute ~ token:", token)
 
     if (!token) {
       return res.status(CONFIG_MESSAGE_ERRORS.UNAUTHORIZED.status).json({
@@ -29,7 +28,6 @@ const protectRoute = async (req, res, next) => {
     } catch {
       return handleUnauthorizedError(res);
     }
-    console.log("protectRoute ~ decoded:", decoded)
 
     if (!decoded) { // If token is invalid
       return handleUnauthorizedError(res);
@@ -37,7 +35,6 @@ const protectRoute = async (req, res, next) => {
 
     // Check user in database
     const user = await User.findById(decoded.userId, "name email avatar").select("-password");
-    console.log("protectRoute ~ user:", user)
 
     // Check if user is authenticated
     if (!user) {
