@@ -1,0 +1,27 @@
+// Define your breakpoints like tailwind
+$breakpoints: (
+  "sm": 640px,
+  "md": 768px,
+  "lg": 1024px,
+  "xl": 1280px,
+  "2xl": 1536px
+);
+
+// Responsive Mixin Function with min-width and max-width
+@mixin respond-to($size, $type: min) {
+  @if map-has-key($breakpoints, $size) {
+    @if $type == min {
+      @media (min-width: map-get($breakpoints, $size)) {
+        @content;
+      }
+    } @else if $type == max {
+      @media (max-width: map-get($breakpoints, $size)) {
+        @content;
+      }
+    } @else {
+      @warn "Invalid type: #{$type}. Use 'min' or 'max'.";
+    }
+  } @else {
+    @warn "Invalid breakpoint: #{$size}. Please use one of: #{map-keys($breakpoints)}.";
+  }
+}
