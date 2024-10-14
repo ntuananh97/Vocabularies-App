@@ -25,6 +25,7 @@ const generateTokenAndSetCookie = (payload, res) => {
   const token = generateAuthToken(payload);
 
   res.cookie(TOKEN_NAME, token, {
+    domain: '.myanki.xyz',
     httpOnly: true,
     secure: checkProduction() ? true : false,
     maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days

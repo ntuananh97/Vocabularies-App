@@ -38,17 +38,12 @@ app.use(bodyParser.json());
 
 routes(app);
 
-app.get("/api/hello", (req, res) => {
-    res.send("Hello World!");
-})
-
-
 // start app
 const port = process.env.PORT || 3001;
 
 const startApp = () => {
     server.listen(port, () => {
-        console.log("Server is running in port: " + `http://localhost:${port}` + " cors🚀" + process.env.FRONTEND_URL);
+        console.log("Server is running in port: " + `http://loclhost:${port}` + " cors🚀" + process.env.FRONTEND_URL);
     });
 }
 
