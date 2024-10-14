@@ -54,18 +54,26 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
     useReviewToday: ENABLE_USE_REVIEW,
     page: 1,
     pageSize: PAGE_SIZE,
-    sort: JSON.stringify({ reviewCount: SORT_TYPE.ASC, updatedAt: SORT_TYPE.DESC }),
+    sort: { reviewCount: SORT_TYPE.ASC, updatedAt: SORT_TYPE.DESC },
   });
 
 
   const fetchData = async (searchParams?: TSearchWordParams) => {
     setLoading(true);
 
+    // Filter
     const newFilter = searchParams?.filter || filter;
     const newUseReviewToday = searchParams?.useReviewToday || params.useReviewToday;
-    const newPage = searchParams?.page || params.page;
-    const newPageSize = searchParams?.pageSize || params.pageSize;
-    const newSort = searchParams?.sort || params.sort;
+
+    // Pagination
+    const FIRST_PAGE = 1;
+    const newPage = searchParams?.page || params.page || FIRST_PAGE;
+    const newPageSize = (searchParams?.pageSize || params.pageSize) as number;
+
+    // Sort
+    const searchParamSort = searchParams?.sort || {};
+    const newSort = {...params.sort, ...searchParamSort}; ;
+    const stringSort = JSON.stringify(newSort) || '';
 
     // remove empty fields
     Object.keys(newFilter).forEach((key) => {
@@ -79,10 +87,11 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
       if (isNotValue && isNotValueButValueIs0)  delete newFilter[typedKey];
     });
 
+    // New params
     const newParams = {
       page: newPage,
-      pageSize: newPageSize,
-      sort: newSort,
+      limit: newPageSize,
+      sort: stringSort,
       filter: JSON.stringify({
         ...newFilter,
         topicId,
@@ -96,7 +105,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
       const response = await getWords(newParams);
       const { list, totalCount } = response.data;
       setReviewWords(list);
-      setPagination({ ...pagination, total: totalCount });
+      setPagination({ ...pagination, current: newPage, total: totalCount });
     } catch (error) {
       handleErrorResponse(error);
     }
@@ -152,6 +161,31 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
     fetchData({useReviewToday: newUseReviewToday});
   }
 
+  const handleTableChange: TableProps<TWordType>['onChange'] = (
+    newPagination,
+    _,
+    sorter
+  ) => {
+    const newParams: Pick<TSearchWordParams, 'sort' | 'page'> = {}
+
+    // Get sort value
+    const { columnKey, order = SORT_TYPE.ASC_TABLE_ANTD } = sorter as {
+      columnKey: string;
+      order: typeof SORT_TYPE.ASC_TABLE_ANTD | typeof SORT_TYPE.DESC_TABLE_ANTD | undefined;
+    };
+
+    const apiOrder =  order === SORT_TYPE.ASC_TABLE_ANTD ? SORT_TYPE.ASC : SORT_TYPE.DESC;
+    if (columnKey) newParams.sort =  {
+      [columnKey]: apiOrder
+    }
+
+    // Get pagination value
+    const { current } = newPagination;
+    if (current) newParams.page = current;
+
+    fetchData(newParams)
+  };
+
   const checked = params.useReviewToday === ENABLE_USE_REVIEW;
 
   const columns: TableProps<TWordType>['columns'] = [
@@ -186,6 +220,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
       title: 'Review Count',
       dataIndex: 'reviewCount',
       key: 'reviewCount',
+      sorter: true,
     },
     {
       title: 'Last Review Date',
@@ -233,6 +268,12 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
         rowKey="_id"
         loading={loading}
         scroll={{ x: 'max-content' }}
+        onChange={handleTableChange}
+        pagination={{
+          pageSize: PAGE_SIZE,
+          current: pagination.current,
+          total: pagination.total,
+        }}
       />
 
       <WordModal

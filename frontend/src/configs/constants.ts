@@ -3,7 +3,9 @@ export const PAGE_SIZE = 10;
 
 export const SORT_TYPE = {
     ASC: 'asc',
-    DESC: 'desc'
+    DESC: 'desc',
+    ASC_TABLE_ANTD: 'ascend',
+    DESC_TABLE_ANTD: 'descend',
 }
 
 export const DATE_FORMAT = 'DD/MM/YYYY'

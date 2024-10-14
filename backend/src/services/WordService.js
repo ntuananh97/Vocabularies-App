@@ -140,19 +140,21 @@ const getWords = (req) => {
       query = { ...query, userId: loggedInUser, ...createdAt, ...updatedAt };
 
       const wordsQuery = [
-        { $limit: calcLimit },    
-        { $skip: skip },        
-      ];
+        { $match: query },
+      ]
 
       if (Object.keys(sortCondition).length > 0) {
-        wordsQuery.unshift({ $sort: sortCondition });
+        wordsQuery.push({ $sort: sortCondition });
       }
 
       const result = await Word.aggregate([
-        { $match: query },
+        ...wordsQuery,
         {
           $facet: {
-            words: wordsQuery,
+            words: [
+              { $skip: skip },        
+              { $limit: calcLimit },    
+            ],
             totalCount: [
               { $count: "count" }    // Count total documents
             ]
@@ -164,7 +166,6 @@ const getWords = (req) => {
         list: result[0].words || [],
         totalCount: result[0].totalCount?.[0]?.count || 0
       };
-
 
       return resolve({
         status: CONFIG_MESSAGE_ERRORS.GET_SUCCESS.status,

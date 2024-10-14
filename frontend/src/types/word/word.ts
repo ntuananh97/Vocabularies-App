@@ -3,6 +3,7 @@ import { ENABLE_USE_REVIEW, UN_ENABLE_USE_REVIEW } from '../../configs/words';
 import { TFileListType } from "@/components/UploadFile/UploadFile";
 import { TInputListType } from "@/components/FormList/FormList";
 import { TLessonType } from "../lesson";
+import { SORT_TYPE } from "@/configs/constants";
 
 export type TDatePickerValue = Dayjs | undefined
 
@@ -36,17 +37,23 @@ export type TWordSearchForm = TWordType & {
   reviewCount: number | null
 };
 
+export type TSortTypeKeyValue = {
+  [key: string]: typeof SORT_TYPE.ASC | typeof SORT_TYPE.DESC;
+};
+
 export type TSearchWordParams = {
   filter?: Partial<TWordSearchForm>;
   topicId?: string
   useReviewToday?: typeof  ENABLE_USE_REVIEW | typeof UN_ENABLE_USE_REVIEW
   page?: number
   pageSize?: number
-  sort?: string
+  sort?: TSortTypeKeyValue
 };
 
-export type TApiSearchWordParams = TSearchWordParams & {
+export type TApiSearchWordParams = Omit<TSearchWordParams, 'filter' | 'sort' | 'pageSize'> & {
   filter?: string;
+  sort?: string;
+  limit: number;
 };
 
 export type TWordFormDataType = Partial<TWordType> & {
