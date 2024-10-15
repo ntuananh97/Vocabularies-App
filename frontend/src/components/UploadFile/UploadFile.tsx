@@ -16,10 +16,11 @@ export type TFileListType = {
 
 interface IUploadFileProps {
   value?: TFileListType[];
+  accept?: string;
   onChange?: (value: TFileListType[]) => void;
 }
 
-const UploadFile: React.FC<IUploadFileProps> = ({value, onChange}) => {
+const UploadFile: React.FC<IUploadFileProps> = ({value, onChange, accept}) => {
   const [loading, setLoading] = useState(false);
   const [urlTextLink, setUrlTextLink] = useState("")
   const [fileList, setFileList] = useState<TFileListType[]>([]);
@@ -30,7 +31,7 @@ const UploadFile: React.FC<IUploadFileProps> = ({value, onChange}) => {
       setFileList(value);
     }
   }, [value]);
-  
+
 
   const handleChangeUpload: UploadProps['onChange'] = (info) => {
     setLoading(info.file.status === 'uploading');
@@ -100,19 +101,21 @@ const UploadFile: React.FC<IUploadFileProps> = ({value, onChange}) => {
         ))}
       </ul>
 
-      <div className="mt-4 flex items-center gap-5">
+      <div className="mt-4 flex flex-col md:flex-row md:items-center gap-5">
         <Upload
           showUploadList={false}
           action={getUploadAction()}
           withCredentials
           onChange={handleChangeUpload}
+          style={{width: '100%'}}
+          accept={accept}
         >
           <Button loading={loading} icon={<UploadOutlined />}>
             Click to Upload
           </Button>
         </Upload>
 
-        <Space.Compact>
+        <Space.Compact style={{width: '100%'}}>
           <Input placeholder="Enter image url" value={urlTextLink} onChange={handleChangeInput} />
           <Button type="primary" icon={<PlusOutlined />} onClick={handleAddUrlTextLink} />
         </Space.Compact>

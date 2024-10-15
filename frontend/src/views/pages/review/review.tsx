@@ -22,6 +22,8 @@ import { ENABLE_USE_REVIEW, UN_ENABLE_USE_REVIEW } from '@/configs/words';
 import SpeakTextWrapper from '@/components/SpeakTextWrapper';
 import MoreAction from './MoreAction';
 import WordInfoModal from '@/components/Modals/WordModal/WordInfoModal';
+import PageContentLayout from '@/components/PageContentLayout';
+import PageContentTitle from '@/components/PageContentLayout/PageContentTitle';
 
 interface IReviewProps {
   topicData: TTopicType;
@@ -245,36 +247,46 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
   ];
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-3 gap-3">
-        <div className='flex flex-col lg:flex-row lg:items-center gap-2'>
-          <Title style={{marginBottom: 0}} level={2}>{topicData.name}</Title>
+    <>
+      <PageContentLayout
+        action={
+          <Button type="primary" onClick={() => openWordModal()}>
+            Add Word
+          </Button>
+        }
+        customHeader={
+          <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+            <PageContentTitle title={topicData.name} />
 
-          <div className='flex items-center gap-1'>
-            <Switch onChange={showReviewWordsOrAllWords} checked={checked} />
-            <span>{checked ? 'Words to review today' : 'All words'}</span>
+            <div className="flex items-center gap-1">
+              <Switch onChange={showReviewWordsOrAllWords} checked={checked} />
+              <span>{checked ? 'Words to review today' : 'All words'}</span>
+            </div>
           </div>
+        }
+      >
+        <div className="mb-5">
+          <WordSearch
+            searchWordParamsFromParent={params}
+            filter={filter}
+            onChangeFilter={handleChangeFilter}
+          />
         </div>
-        <Button type='primary' onClick={() => openWordModal()}>Add Word</Button>
-      </div>
 
-      <div className="mb-5">
-        <WordSearch searchWordParamsFromParent={params}  filter={filter} onChangeFilter={handleChangeFilter} />
-      </div>
-
-      <Table<TWordType>
-        columns={columns}
-        dataSource={reviewWords}
-        rowKey="_id"
-        loading={loading}
-        scroll={{ x: 'max-content' }}
-        onChange={handleTableChange}
-        pagination={{
-          pageSize: PAGE_SIZE,
-          current: pagination.current,
-          total: pagination.total,
-        }}
-      />
+        <Table<TWordType>
+          columns={columns}
+          dataSource={reviewWords}
+          rowKey="_id"
+          loading={loading}
+          scroll={{ x: 'max-content' }}
+          onChange={handleTableChange}
+          pagination={{
+            pageSize: PAGE_SIZE,
+            current: pagination.current,
+            total: pagination.total,
+          }}
+        />
+      </PageContentLayout>
 
       <WordModal
         visible={isOpenWordModal}
@@ -288,7 +300,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
         onCancel={() => setIsOpenWordInfoModal(false)}
         editData={editTopicData}
       />
-    </div>
+    </>
   );
 };
 

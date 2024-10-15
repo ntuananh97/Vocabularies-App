@@ -40,7 +40,6 @@ const WordInfoModal: React.FC<TWordInfoModal> = ({
       try {
         const response = await getDetailWord(editDataId);
         setWordInfo(response.data);
-        console.log('fetchData ~ response:', response);
       } catch (error) {
         handleErrorResponse(error);
       }
@@ -81,10 +80,12 @@ const WordInfoModal: React.FC<TWordInfoModal> = ({
             )}
           </div>
           <Descriptions bordered layout='vertical' column={3}>
-            <Descriptions.Item label="Definition" span={3}>
-              {wordInfo.definition}
-            </Descriptions.Item>
-            <Descriptions.Item label="Review count" span={1}>
+            {wordInfo.definition && (
+              <Descriptions.Item label="Definition" span={3}>
+                {wordInfo.definition}
+              </Descriptions.Item>
+            )}
+            <Descriptions.Item label="Review count"  span={1}>
               {wordInfo.reviewCount}
             </Descriptions.Item>
             <Descriptions.Item label="Step" span={2}>{wordInfo.step}</Descriptions.Item>

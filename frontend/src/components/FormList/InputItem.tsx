@@ -21,7 +21,7 @@ const InputItem: React.FC<IInputItemProps> = ({
 }) => {
 
   return (
-    <Space.Compact>
+    <Space.Compact style={{width: '100%'}}>
       <Input
         placeholder="Input example"
         value={value}

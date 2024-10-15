@@ -115,7 +115,7 @@ const WordModal: React.FC<TWordModal> = ({
       )}
     >
       <Row gutter={15}>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item<TWordFormDataType>
             label="Structure"
             name="title"
@@ -124,7 +124,7 @@ const WordModal: React.FC<TWordModal> = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item<TWordFormDataType>
             label="Word"
             name="keyWord"
@@ -133,7 +133,7 @@ const WordModal: React.FC<TWordModal> = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item<TWordFormDataType>
             label="Definition"
             name="definition"
@@ -142,7 +142,7 @@ const WordModal: React.FC<TWordModal> = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item<TWordFormDataType>
             label="Pronunciation"
             name="pronounciation"
@@ -151,22 +151,22 @@ const WordModal: React.FC<TWordModal> = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item<TWordFormDataType> label="Description" name="description">
             <Input />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} md={12} lg={8}>
           <Form.Item<TWordFormDataType> label="Group" name="lessonId">
             <LessonSelect />
           </Form.Item>
         </Col>
-        <Col span={24}>
+        <Col xs={24}>
           <Form.Item<TWordFormDataType> label="Images" name="localImages">
-            <UploadFile />
+            <UploadFile accept="image/png, image/jpeg" />
           </Form.Item>
         </Col>
-        <Col span={24}>
+        <Col xs={24}>
           <Form.Item<TWordFormDataType> label="Examples" name="localExamples">
             <FormList />
           </Form.Item>
