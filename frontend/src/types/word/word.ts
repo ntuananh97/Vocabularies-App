@@ -2,7 +2,7 @@ import { Dayjs } from "dayjs";
 import { ENABLE_USE_REVIEW, UN_ENABLE_USE_REVIEW } from '../../configs/words';
 import { TFileListType } from "@/components/UploadFile/UploadFile";
 import { TInputListType } from "@/components/FormList/FormList";
-import { TLessonType } from "../lesson";
+import { TGroupType } from "../lesson";
 import { SORT_TYPE } from "@/configs/constants";
 
 export type TDatePickerValue = Dayjs | undefined
@@ -26,7 +26,7 @@ export type TWordType = {
   userId: string;
   createdAt: string;
   updatedAt: string;
-  lesson?: TLessonType;
+  lesson?: TGroupType;
 };
 
 
