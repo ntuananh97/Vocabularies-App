@@ -12,18 +12,18 @@ type TGroupModal = {
   onFetchNewData?: (_data: DefaultOptionType) => void;
 };
 
-const GroupModal: React.FC<TGroupModal> = ({ visible, onCancel, editData = {} as TGroupType, onFetchNewData }) => {
+const GroupModal: React.FC<TGroupModal> = ({ visible, onCancel, editData, onFetchNewData }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const isEdit = !!editData._id;
+  const isEdit = !!editData?._id;
 
   useEffect(() => {
     if (visible) {
       form.setFieldsValue({
-        name: editData.name,
+        name: editData?.name || '',
       });
     }
-  }, [visible, isEdit, editData, form]);
+  }, [visible, editData, form]);
 
   const createOrUpdateGroup = async (values: TGroupFormData) => {
 
@@ -69,9 +69,6 @@ const GroupModal: React.FC<TGroupModal> = ({ visible, onCancel, editData = {} as
             layout="vertical"
             form={form}
             onFinish={(values) => createOrUpdateGroup(values)}
-            initialValues={{
-              name: editData.name || '',
-            }}
           >
             {dom}
           </Form>
