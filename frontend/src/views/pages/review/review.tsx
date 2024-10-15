@@ -10,7 +10,7 @@ import { handleErrorResponse, handleSuccessResponse } from '@/helpers/response';
 import { getWords, markWordAsReviewed } from '@/services/word';
 import { TTopicType } from '@/types/topic';
 import { TSearchWordParams, TWordSearchForm, TWordType } from '@/types/word';
-import { Button, Switch, Table, TableProps, Tooltip, Typography } from 'antd';
+import { Button, Switch, Table, TableProps, Tooltip } from 'antd';
 import {
   EditOutlined,
   CheckOutlined,
@@ -29,8 +29,8 @@ interface IReviewProps {
   topicData: TTopicType;
 }
 
-const { Title } = Typography;
 const initialEditWordData = {} as TWordType;
+const ATTRIBUTES = "title,keyWord,pronounciation,definition,reviewCount,updatedAt";
 
 const Review: React.FC<IReviewProps> = ({ topicData }) => {
   const topicId = topicData._id;
@@ -99,6 +99,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
         topicId,
       }),
       useReviewToday: newUseReviewToday,
+      atrributes: ATTRIBUTES
     };
 
     if (newUseReviewToday !== ENABLE_USE_REVIEW) delete newParams.useReviewToday;

@@ -1,8 +1,8 @@
+import CreateGroupFast from '@/components/CreateFast/CreateGroupFast';
 import FormList from '@/components/FormList';
-import LessonSelect from '@/components/Selects/LessonSelect';
 import UploadFile from '@/components/UploadFile';
 import { handleErrorResponse, handleSuccessResponse } from '@/helpers/response';
-import { createNewWord, updateWord } from '@/services/word';
+import { createNewWord, getDetailWord, updateWord } from '@/services/word';
 import { TWordFormDataType, TWordType } from '@/types/word';
 import { generateUniqueId, trimStringValue } from '@/utils';
 import { Modal, Form, Input, Row, Col, Space, Button } from 'antd';
@@ -25,30 +25,48 @@ const WordModal: React.FC<TWordModal> = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const isEdit = !!editData._id;
+
+  const editDataId = editData._id;
+  const isEdit = !!editDataId;
 
   useEffect(() => {
-    if (visible) {
-      console.log('editData:', editData);
-      const localImages = editData.images?.map((url) => ({ id: generateUniqueId(), url })) || [];
-      const localExamples = editData.examples?.map((example) => ({ id: generateUniqueId(), value: example })) || [];
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const response = await getDetailWord(editDataId);
+        const detailWord: TWordType = response.data;
 
-      form.setFieldsValue({
-        title: editData.title,
-        keyWord: editData.keyWord,
-        definition: editData.definition,
-        pronounciation: editData.pronounciation,
-        description: editData.description,
-        lessonId: editData.lessonId,
-        localImages,
-        localExamples,
-      });
-    }
-  }, [visible, isEdit, editData, form]);
+        const localImages =
+          detailWord.images?.map((url) => ({ id: generateUniqueId(), url })) ||
+          [];
+
+        const localExamples =
+          detailWord.examples?.map((example) => ({
+            id: generateUniqueId(),
+            value: example,
+          })) || [];
+          
+        form.setFieldsValue({
+          title: detailWord.title,
+          keyWord: detailWord.keyWord,
+          definition: detailWord.definition,
+          pronounciation: detailWord.pronounciation,
+          description: detailWord.description,
+          lessonId: detailWord.lessonId?._id || '',
+          localImages,
+          localExamples,
+        });
+      } catch (error) {
+        handleErrorResponse(error);
+      }
+      setLoading(false);
+    };
+
+    if (visible && editDataId) fetchData();
+  }, [visible, editDataId]);
+
 
   const createOrUpdateTopic = async (values: TWordFormDataType) => {
-    console.log('createOrUpdateTopic ~ values:', values);
-
     const images = values.localImages?.map((image) => image.url) || [];
     const examples = values.localExamples?.map((item) => item.value) || [];
 
@@ -67,7 +85,7 @@ const WordModal: React.FC<TWordModal> = ({
     setLoading(true);
     try {
       isEdit
-        ? await updateWord(editData._id, payload)
+        ? await updateWord(editDataId, payload)
         : await createNewWord(payload);
       handleSuccessResponse(
         `Topic ${isEdit ? 'updated' : 'created'} successfully`
@@ -115,7 +133,7 @@ const WordModal: React.FC<TWordModal> = ({
       )}
     >
       <Row gutter={15}>
-        <Col xs={24} md={12} lg={8}>
+        <Col xs={24} md={12} >
           <Form.Item<TWordFormDataType>
             label="Structure"
             name="title"
@@ -124,7 +142,7 @@ const WordModal: React.FC<TWordModal> = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col xs={24} md={12} lg={8}>
+        <Col xs={24} md={12} >
           <Form.Item<TWordFormDataType>
             label="Word"
             name="keyWord"
@@ -133,7 +151,7 @@ const WordModal: React.FC<TWordModal> = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col xs={24} md={12} lg={8}>
+        <Col xs={24} md={12} >
           <Form.Item<TWordFormDataType>
             label="Definition"
             name="definition"
@@ -142,7 +160,7 @@ const WordModal: React.FC<TWordModal> = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col xs={24} md={12} lg={8}>
+        <Col xs={24} md={12} >
           <Form.Item<TWordFormDataType>
             label="Pronunciation"
             name="pronounciation"
@@ -151,14 +169,14 @@ const WordModal: React.FC<TWordModal> = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col xs={24} md={12} lg={8}>
+        <Col xs={24} md={12}>
           <Form.Item<TWordFormDataType> label="Description" name="description">
             <Input />
           </Form.Item>
         </Col>
-        <Col xs={24} md={12} lg={8}>
+        <Col xs={24} md={12}>
           <Form.Item<TWordFormDataType> label="Group" name="lessonId">
-            <LessonSelect />
+            <CreateGroupFast />
           </Form.Item>
         </Col>
         <Col xs={24}>

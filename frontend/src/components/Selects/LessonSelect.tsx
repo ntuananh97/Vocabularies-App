@@ -1,18 +1,20 @@
 import { getLessons } from '@/services/lesson';
-import { TLessonType } from '@/types/lesson';
+import { TGroupSelectImperativeRef } from '@/types/createFast';
+import { TGroupType } from '@/types/lesson';
 import { Select, SelectProps } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { DefaultOptionType } from 'antd/es/select';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 interface ILessonSelectProps extends SelectProps {
   onChange?: (_value: string) => void;
   value?: string;
 }
 
-const LessonSelect: React.FC<ILessonSelectProps> = ({
+const LessonSelect = forwardRef<TGroupSelectImperativeRef, ILessonSelectProps>(({
   onChange,
   value,
   ...props
-}) => {
+}, ref) => {
   const [lessons, setLessons] = useState<SelectProps['options']>([]);
   const [intervalValue, setIntervalValue] = useState("")
 
@@ -23,7 +25,7 @@ const LessonSelect: React.FC<ILessonSelectProps> = ({
   useEffect(() => {
     const fetchData = async () => {
       const response = await getLessons();
-      const data = response.data as TLessonType[];
+      const data = response.data as TGroupType[];
       const newLessons = data.map((item) => ({
         value: item._id,
         label: item.name,
@@ -32,6 +34,15 @@ const LessonSelect: React.FC<ILessonSelectProps> = ({
     };
 
     fetchData();
+  }, []);
+
+  useImperativeHandle(ref, () => {
+    return {
+      updateNewGroupValue(data: DefaultOptionType) {
+        setIntervalValue(data.value as string);
+        setLessons(prev => ([data, ...(prev || [])]))
+      }
+    };
   }, []);
 
   const handleChange = (value: string) => {
@@ -47,6 +58,6 @@ const LessonSelect: React.FC<ILessonSelectProps> = ({
       options={lessons}
     />
   );
-};
+});
 
 export default LessonSelect;

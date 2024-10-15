@@ -4,8 +4,7 @@ const Lesson = require("../models/lesson.model");
 
 const create = (newData, createdUserId) => {
   return new Promise(async (resolve, reject) => {
-    const { name } =
-    newData;
+    const { name } = newData;
 
     try {
 
@@ -13,6 +12,17 @@ const create = (newData, createdUserId) => {
         name,
         userId: createdUserId,
       };
+
+      const checkExistGroup = await Lesson.findOne({ name , userId: createdUserId });
+      if (checkExistGroup) {
+        return resolve({
+          status: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.status,
+          message: "The group is existed",
+          typeError: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.type,
+          data: null,
+          statusMessage: "Error",
+        });
+      }
 
       const createdLesson = await Lesson.create(newLesson);
 
