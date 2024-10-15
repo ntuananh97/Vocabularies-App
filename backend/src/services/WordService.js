@@ -88,15 +88,17 @@ const create = (bodyData, createdUserId) => {
 const getWords = (req) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const {useReviewToday, sort, filter, limit, page} = req.query;
+      const {useReviewToday, sort, filter, limit, page, atrributes} = req.query;
 
       let query = filter ? JSON.parse(filter) : {};
       let sortCondition = {};
+      const wordFacet = [];
 
       // pagination
       const calcLimit = +limit || DEFAULT_PAGE_SIZE;
       const calcPage = +page || DEFAULT_PAGE;
       const skip = (calcPage - 1) * calcLimit;
+      wordFacet.push({ $skip: skip }, { $limit: calcLimit });
 
       // Sort data
       if (sort) {
@@ -147,14 +149,22 @@ const getWords = (req) => {
         wordsQuery.push({ $sort: sortCondition });
       }
 
+      // Get attributes
+      const project = {};
+      if (atrributes) {
+        const attributesArr = atrributes.split(",");
+        attributesArr.forEach((key) => {
+          project[key] = 1;
+        });
+        wordFacet.push({ $project: project });
+      }
+
+
       const result = await Word.aggregate([
         ...wordsQuery,
         {
           $facet: {
-            words: [
-              { $skip: skip },        
-              { $limit: calcLimit },    
-            ],
+            words: wordFacet,
             totalCount: [
               { $count: "count" }    // Count total documents
             ]
@@ -299,11 +309,6 @@ const getDetailWord = (updateId) => {
           statusMessage: "Error",
         });
         return;
-      }
-
-      // keep lessonId and populate value to lesson
-      if (wordInfo.lessonId) {
-        wordInfo.lesson = wordInfo.lessonId;
       }
 
       return resolve({

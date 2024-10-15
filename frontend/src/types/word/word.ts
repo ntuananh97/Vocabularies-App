@@ -21,7 +21,7 @@ export type TWordType = {
   step: number;
   nextReviewDate: string;
   reviewHistory: {reviewDate: string, step: number}[];
-  lessonId: string;
+  lessonId: TGroupType;
   topicId: string;
   userId: string;
   createdAt: string;
