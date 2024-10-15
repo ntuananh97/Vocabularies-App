@@ -45,7 +45,7 @@ const WordModal: React.FC<TWordModal> = ({
             id: generateUniqueId(),
             value: example,
           })) || [];
-
+          
         form.setFieldsValue({
           title: detailWord.title,
           keyWord: detailWord.keyWord,
@@ -62,7 +62,7 @@ const WordModal: React.FC<TWordModal> = ({
       setLoading(false);
     };
 
-    if (editDataId) fetchData();
+    if (visible && editDataId) fetchData();
   }, [visible, editDataId]);
 
 

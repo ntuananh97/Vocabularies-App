@@ -4,8 +4,9 @@ import { Button, Input, notification, Space, Upload, UploadProps } from 'antd';
 import { UploadOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { BASE_URL } from '@/helpers/axios/axios';
 import { API_ENDPOINTS } from '@/configs/api';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { generateUniqueId } from '@/utils';
+import { MAX_URL_LENGTH } from '@/configs/constants';
 
 const getUploadAction = () => `${BASE_URL}${API_ENDPOINTS.UPLOAD.SINGLE}`;
 
@@ -68,9 +69,16 @@ const UploadFile: React.FC<IUploadFileProps> = ({value, onChange, accept}) => {
     setUrlTextLink(e.target.value)
   }
 
+  const isValidUrlLink = useMemo(() => {
+    if (!urlTextLink) return true;
+    const pattern = /^http[s]?:\/\//; // starts with http:// or https://
+    return pattern.test(urlTextLink);
+  }, [urlTextLink])
+
   const handleAddUrlTextLink = () => {
-    const trimValue = urlTextLink.trim()
-    if (!trimValue) return;
+    const trimValue = urlTextLink.trim();
+    const isExceedMaxLength = trimValue.length > MAX_URL_LENGTH;
+    if (!trimValue || isExceedMaxLength || !isValidUrlLink) return;
 
     const newFile = { id: `${Math.random()}`, url: trimValue };
     handleChangeProps([newFile, ...fileList]);
@@ -101,13 +109,13 @@ const UploadFile: React.FC<IUploadFileProps> = ({value, onChange, accept}) => {
         ))}
       </ul>
 
-      <div className="mt-4 flex flex-col md:flex-row md:items-center gap-5">
+      <div className="mt-4 flex flex-col gap-5">
         <Upload
           showUploadList={false}
           action={getUploadAction()}
           withCredentials
           onChange={handleChangeUpload}
-          style={{width: '100%'}}
+          style={{ width: '100%' }}
           accept={accept}
         >
           <Button loading={loading} icon={<UploadOutlined />}>
@@ -115,10 +123,26 @@ const UploadFile: React.FC<IUploadFileProps> = ({value, onChange, accept}) => {
           </Button>
         </Upload>
 
-        <Space.Compact style={{width: '100%'}}>
-          <Input placeholder="Enter image url" value={urlTextLink} onChange={handleChangeInput} />
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleAddUrlTextLink} />
-        </Space.Compact>
+        <div className='w-full'>
+          <Space.Compact style={{ width: '100%' }}>
+            <Input
+              count={{
+                show: true,
+                max: MAX_URL_LENGTH,
+              }}
+              status={!isValidUrlLink ? 'error' : undefined}
+              placeholder="Enter image url"
+              value={urlTextLink}
+              onChange={handleChangeInput}
+            />
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleAddUrlTextLink}
+            />
+          </Space.Compact>
+          {!isValidUrlLink && <p className="text-red-600 text-xs mt-1">Invalid url</p>}
+        </div>
       </div>
     </div>
   );
