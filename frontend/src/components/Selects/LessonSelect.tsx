@@ -23,6 +23,8 @@ const LessonSelect = forwardRef<TGroupSelectImperativeRef, ILessonSelectProps>((
   }, [value])
 
   useEffect(() => {
+    console.log('fetching data in effect');
+
     const fetchData = async () => {
       const response = await getLessons();
       const data = response.data as TGroupType[];

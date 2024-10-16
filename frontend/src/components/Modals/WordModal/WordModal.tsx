@@ -5,7 +5,7 @@ import { handleErrorResponse, handleSuccessResponse } from '@/helpers/response';
 import { createNewWord, getDetailWord, updateWord } from '@/services/word';
 import { TWordFormDataType, TWordType } from '@/types/word';
 import { generateUniqueId, trimStringValue } from '@/utils';
-import { Modal, Form, Input, Row, Col, Space, Button } from 'antd';
+import { Modal, Form, Input, Row, Col, Spin } from 'antd';
 import { useEffect, useState } from 'react';
 
 type TWordModal = {
@@ -45,7 +45,7 @@ const WordModal: React.FC<TWordModal> = ({
             id: generateUniqueId(),
             value: example,
           })) || [];
-          
+
         form.setFieldsValue({
           title: detailWord.title,
           keyWord: detailWord.keyWord,
@@ -109,31 +109,32 @@ const WordModal: React.FC<TWordModal> = ({
       open={visible}
       onCancel={handleCancel}
       okText={isEdit ? 'Update' : 'Create'}
-      loading={loading}
       okButtonProps={{ autoFocus: true, htmlType: 'submit' }}
       style={{ minWidth: '50%' }}
       modalRender={(dom) => (
-        <Form
-          layout="vertical"
-          form={form}
-          onFinish={(values) => createOrUpdateTopic(values)}
-          initialValues={{
-            title: '',
-            keyWord: '',
-            definition: '',
-            pronounciation: '',
-            description: '',
-            lessonId: '',
-            localImages: [],
-            localExamples: [],
-          }}
-        >
-          {dom}
-        </Form>
+        <Spin spinning={loading}>
+          <Form
+            layout="vertical"
+            form={form}
+            onFinish={(values) => createOrUpdateTopic(values)}
+            initialValues={{
+              title: '',
+              keyWord: '',
+              definition: '',
+              pronounciation: '',
+              description: '',
+              lessonId: '',
+              localImages: [],
+              localExamples: [],
+            }}
+          >
+            {dom}
+          </Form>
+        </Spin>
       )}
     >
       <Row gutter={15}>
-        <Col xs={24} md={12} >
+        <Col xs={24} md={12}>
           <Form.Item<TWordFormDataType>
             label="Structure"
             name="title"
@@ -142,7 +143,7 @@ const WordModal: React.FC<TWordModal> = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col xs={24} md={12} >
+        <Col xs={24} md={12}>
           <Form.Item<TWordFormDataType>
             label="Word"
             name="keyWord"
@@ -151,7 +152,7 @@ const WordModal: React.FC<TWordModal> = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col xs={24} md={12} >
+        <Col xs={24} md={12}>
           <Form.Item<TWordFormDataType>
             label="Definition"
             name="definition"
@@ -160,7 +161,7 @@ const WordModal: React.FC<TWordModal> = ({
             <Input />
           </Form.Item>
         </Col>
-        <Col xs={24} md={12} >
+        <Col xs={24} md={12}>
           <Form.Item<TWordFormDataType>
             label="Pronunciation"
             name="pronounciation"
