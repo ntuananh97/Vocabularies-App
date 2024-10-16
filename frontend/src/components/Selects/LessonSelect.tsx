@@ -4,6 +4,7 @@ import { TGroupType } from '@/types/lesson';
 import { Select, SelectProps } from 'antd';
 import { DefaultOptionType } from 'antd/es/select';
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import debounce from 'lodash/debounce';
 
 interface ILessonSelectProps extends SelectProps {
   onChange?: (_value: string) => void;
@@ -58,6 +59,8 @@ const LessonSelect = forwardRef<TGroupSelectImperativeRef, ILessonSelectProps>((
       value={intervalValue}
       onChange={handleChange}
       options={lessons}
+      showSearch
+      // onSearch={handleSearch}
     />
   );
 });

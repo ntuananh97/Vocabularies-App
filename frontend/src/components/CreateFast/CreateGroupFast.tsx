@@ -5,6 +5,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import GroupModal from '../Modals/GroupModal';
 import { TGroupSelectImperativeRef } from '@/types/createFast';
 import { DefaultOptionType } from 'antd/es/select';
+import TestDebounceSelect from '../Selects/TestDebounceSelect';
 
 interface CreateGroupFastProps {
   onChange?: (_value: string) => void;
@@ -32,6 +33,7 @@ const CreateGroupFast: React.FC<CreateGroupFastProps> = ({onChange, value}) => {
     <>
       <Space.Compact style={{ width: '100%' }}>
         <LessonSelect ref={selectRef} onChange={onChange} value={value} />
+        <TestDebounceSelect onChange={onChange} value={value} />
         <Tooltip title="Create new group">
           <Button
             type="primary"
