@@ -4,6 +4,7 @@ import { TFileListType } from "@/components/UploadFile/UploadFile";
 import { TInputListType } from "@/components/FormList/FormList";
 import { TGroupType } from "../lesson";
 import { SORT_TYPE } from "@/configs/constants";
+import { TQueryParams } from "../common";
 
 export type TDatePickerValue = Dayjs | undefined
 
@@ -50,11 +51,7 @@ export type TSearchWordParams = {
   sort?: TSortTypeKeyValue
 };
 
-export type TApiSearchWordParams = Omit<TSearchWordParams, 'filter' | 'sort' | 'pageSize'> & {
-  filter?: string;
-  sort?: string;
-  limit: number;
-};
+export type TApiSearchWordParams = Omit<TSearchWordParams, 'filter' | 'sort' | 'pageSize'> & TQueryParams
 
 export type TWordFormDataType = Partial<TWordType> & {
   localImages?: TFileListType[];

@@ -31,7 +31,7 @@ const CreateGroupFast: React.FC<CreateGroupFastProps> = ({onChange, value}) => {
   return (
     <>
       <Space.Compact style={{ width: '100%' }}>
-        <LessonSelect ref={selectRef} onChange={onChange} value={value} />
+        <LessonSelect allowClear ref={selectRef} onChange={onChange} value={value} placeholder="Type to search group" />
         <Tooltip title="Create new group">
           <Button
             type="primary"
