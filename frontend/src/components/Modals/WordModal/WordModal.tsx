@@ -52,7 +52,7 @@ const WordModal: React.FC<TWordModal> = ({
           definition: detailWord.definition,
           pronounciation: detailWord.pronounciation,
           description: detailWord.description,
-          lessonId: detailWord.lessonId?._id || '',
+          lessonId: detailWord.lessonId?._id || undefined,
           localImages,
           localExamples,
         });
@@ -123,7 +123,7 @@ const WordModal: React.FC<TWordModal> = ({
               definition: '',
               pronounciation: '',
               description: '',
-              lessonId: '',
+              lessonId: undefined,
               localImages: [],
               localExamples: [],
             }}

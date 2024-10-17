@@ -99,7 +99,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
         topicId,
       }),
       useReviewToday: newUseReviewToday,
-      atrributes: ATTRIBUTES
+      attributes: ATTRIBUTES
     };
 
     if (newUseReviewToday !== ENABLE_USE_REVIEW) delete newParams.useReviewToday;

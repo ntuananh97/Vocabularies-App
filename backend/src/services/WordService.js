@@ -1,11 +1,12 @@
 /* eslint-disable no-async-promise-executor */
 
-const { CONFIG_MESSAGE_ERRORS, DEFAULT_PAGE_SIZE, DEFAULT_PAGE } = require("../configs/constants");
+const { CONFIG_MESSAGE_ERRORS } = require("../configs/constants");
 const dayjs = require('dayjs');
 const Word = require('../models/word.model');
 const Period = require('../models/period.model');
 const { convertStringToObjectId } = require("../utils");
 const { getDateQuery } = require("../utils/convertDate");
+const { calcPagination, getAttributesForQuery, getSortCondition } = require("../utils/query");
 
 const ENABLE_USE_REVIEW_TODAY = "1";
 
@@ -88,27 +89,17 @@ const create = (bodyData, createdUserId) => {
 const getWords = (req) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const {useReviewToday, sort, filter, limit, page, atrributes} = req.query;
+      const {useReviewToday, sort, filter, limit, page, attributes} = req.query;
 
       let query = filter ? JSON.parse(filter) : {};
-      let sortCondition = {};
+      const sortCondition = getSortCondition(sort);
       const wordFacet = [];
 
       // pagination
-      const calcLimit = +limit || DEFAULT_PAGE_SIZE;
-      const calcPage = +page || DEFAULT_PAGE;
-      const skip = (calcPage - 1) * calcLimit;
+      const {calcLimit, skip} = calcPagination(page, limit);
       wordFacet.push({ $skip: skip }, { $limit: calcLimit });
 
-      // Sort data
-      if (sort) {
-        const parsedSort = JSON.parse(sort);
-        Object.keys(parsedSort).forEach((key) => {
-          sortCondition[key] = parsedSort[key] === 'asc' ? 1 : -1;
-        });
-      }
-
-        // Get all words that need to be reviewed less than or equal to today
+      // Get all words that need to be reviewed less than or equal to today
       if (useReviewToday === ENABLE_USE_REVIEW_TODAY) {
         const todayUTC = dayjs.utc().endOf('day');
         query = { ...query ,nextReviewDate: { $lte: todayUTC.toDate() } };
@@ -150,12 +141,8 @@ const getWords = (req) => {
       }
 
       // Get attributes
-      const project = {};
-      if (atrributes) {
-        const attributesArr = atrributes.split(",");
-        attributesArr.forEach((key) => {
-          project[key] = 1;
-        });
+      if (attributes) {
+        const project = getAttributesForQuery(attributes);
         wordFacet.push({ $project: project });
       }
 
@@ -214,7 +201,7 @@ const updateOnlyInfoWord = (updatedData = {}, updateId) => {
 
       const {lessonId, topicId} = updatedData;
 
-      if (lessonId) updatedData.lessonId = convertStringToObjectId(lessonId);
+      updatedData.lessonId = lessonId ? convertStringToObjectId(lessonId) : undefined;
       if (topicId) updatedData.topicId = convertStringToObjectId(topicId);
 
       // Modify fields

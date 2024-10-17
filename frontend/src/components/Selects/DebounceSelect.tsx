@@ -1,7 +1,5 @@
-import { getLessons } from '@/services/lesson';
 import { TGroupSelectImperativeRef } from '@/types/createFast';
-import { TGroupType } from '@/types/lesson';
-import { Select, SelectProps } from 'antd';
+import { Select, SelectProps, Spin } from 'antd';
 import { DefaultOptionType } from 'antd/es/select';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import debounce from 'lodash/debounce';
@@ -10,11 +8,10 @@ interface ISelectProps extends SelectProps {
   onChange?: (_value: string) => void;
   value?: string;
   debounceTimeout?: number;
-  fetchOptions: (search: string) => Promise<DefaultOptionType[]>;
+  fetchOptions: (search?: string) => Promise<DefaultOptionType[]>;
 }
 
-const PAGINATION_LIMIT = 10;
-const DEBOUNCE_TIMEOUT = 300; // ms
+const DEBOUNCE_TIMEOUT = 500; // ms
 
 const DebounceSelect = forwardRef<TGroupSelectImperativeRef, ISelectProps>(({
   onChange,
@@ -24,79 +21,61 @@ const DebounceSelect = forwardRef<TGroupSelectImperativeRef, ISelectProps>(({
   ...props
 }, ref) => {
   const [options, setOptions] = useState<SelectProps['options']>([]);
-  const [intervalValue, setIntervalValue] = useState("");
-  const [searchValue, setSearchValue] = useState<string>('');
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (value !== undefined) setIntervalValue(value);
-  }, [value])
+  const fetchData = useCallback(
+    async (search?: string) => {
+      setLoading(true);
 
-  // useEffect(() => {
-  //   console.log('fetching data in effect');
+      const newOptions = await fetchOptions(search);
+      setOptions(newOptions);
 
-  //   const fetchData = async () => {
-  //     const response = await getLessons();
-  //     const data = response.data as TGroupType[];
-  //     const newLessons = data.map((item) => ({
-  //       value: item._id,
-  //       label: item.name,
-  //     }));
-  //     setOptions(newLessons);
-  //   };
+      setLoading(false);
+    },
+    [fetchOptions],
+  )
 
-  //   fetchData();
-  // }, []);
 
   const debouncedFetchOptions = useCallback(
     debounce(async (search: string) => {
-      setLoading(true);
-      try {
-        const newOptions = await fetchOptions(search);
-        setOptions(newOptions);
-      } catch (error) {
-        console.error('Error fetching options:', error);
-        setOptions([]);
-      } finally {
-        setLoading(false);
-      }
+      fetchData(search)
     }, debounceTimeout),
-    [fetchOptions, debounceTimeout]
+    [fetchData, debounceTimeout]
   );
 
   useEffect(() => {
-    debouncedFetchOptions(searchValue);
+    fetchData();
+  }, [])
+
+
+  useEffect(() => {
     return () => {
       debouncedFetchOptions.cancel();
     };
-  }, [searchValue, debouncedFetchOptions]);
+  }, [debouncedFetchOptions]);
 
   useImperativeHandle(ref, () => {
     return {
       updateNewGroupValue(data: DefaultOptionType) {
-        setIntervalValue(data.value as string);
+        onChange?.(data.value as string);
         setOptions(prev => ([data, ...(prev || [])]))
       }
     };
   }, []);
 
   const handleChange = (value: string) => {
-    if (value === undefined) setIntervalValue(value);
     onChange?.(value);
-  };
-
-  const handleSearch = (value: string) => {
-    setSearchValue(value);
   };
 
   return (
     <Select
       {...props}
-      value={intervalValue}
+      value={value}
       onChange={handleChange}
       options={options}
-      showSearch
-      onSearch={handleSearch}
+      onSearch={debouncedFetchOptions}
+      filterOption={false}
+      notFoundContent={loading ? <Spin size="small" /> : null}
       loading={loading}
     />
   );

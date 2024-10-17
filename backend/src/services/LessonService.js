@@ -1,6 +1,7 @@
 /* eslint-disable no-async-promise-executor */
 const { CONFIG_MESSAGE_ERRORS } = require("../configs/constants");
 const Lesson = require("../models/lesson.model");
+const { calcPagination, getSortCondition } = require("../utils/query");
 
 const create = (newData, createdUserId) => {
   return new Promise(async (resolve, reject) => {
@@ -53,14 +54,50 @@ const getLessons = (req) => {
   return new Promise(async (resolve, reject) => {
     try {
       const loggedInUser = req.user._id;
+      const {sort, filter, limit, page} = req.query;
+      let query = filter ? JSON.parse(filter) : {};
+      query.userId = loggedInUser;
+
+      const {calcLimit, skip} = calcPagination(page, limit);
+      const sortCondition = getSortCondition(sort);
+
+       // search by regex with some fields
+       const searchFields = ["name"];
+       searchFields.forEach((field) => {
+         if (query[field]) {
+           query[field] = { $regex: query[field]?.trim() || "", $options: "i" };
+         }
+       });
+
       
-      // Get all lessons of user
-      const lessons = await Lesson.find({ userId: loggedInUser });
+      const lessonsQuery = [
+        { $match: query },
+      ]
+      if (Object.keys(sortCondition).length > 0) {
+        lessonsQuery.push({ $sort: sortCondition });
+      }
+
+      const result = await Lesson.aggregate([
+        ...lessonsQuery,
+        {
+          $facet: {
+            data: [{ $skip: skip }, { $limit: calcLimit }],
+            totalCount: [
+              { $count: "count" }    // Count total documents
+            ]
+          }
+        }
+      ]);
+
+      const data = {
+        list: result[0].data || [],
+        totalCount: result[0].totalCount?.[0]?.count || 0
+      };
       
       return resolve({
         status: CONFIG_MESSAGE_ERRORS.GET_SUCCESS.status,
         message: "Get lessons success",
-        data: lessons,
+        data,
         statusMessage: "Success",
       });
     } catch (error) {

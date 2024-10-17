@@ -1,68 +1,51 @@
+import React, { forwardRef, useCallback } from 'react'
+import DebounceSelect from './DebounceSelect'
+import { SelectProps } from 'antd';
 import { getLessons } from '@/services/lesson';
+import { PAGE_SIZE } from '@/configs/constants';
+import { TQueryParams } from '@/types/common';
 import { TGroupSelectImperativeRef } from '@/types/createFast';
-import { TGroupType } from '@/types/lesson';
-import { Select, SelectProps } from 'antd';
-import { DefaultOptionType } from 'antd/es/select';
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import debounce from 'lodash/debounce';
 
 interface ILessonSelectProps extends SelectProps {
-  onChange?: (_value: string) => void;
-  value?: string;
-}
+    onChange?: (_value: string) => void;
+    value?: string;
+  }
 
-const LessonSelect = forwardRef<TGroupSelectImperativeRef, ILessonSelectProps>(({
-  onChange,
-  value,
-  ...props
-}, ref) => {
-  const [lessons, setLessons] = useState<SelectProps['options']>([]);
-  const [intervalValue, setIntervalValue] = useState("")
 
-  useEffect(() => {
-    if (value !== undefined) setIntervalValue(value);
-  }, [value])
+const LessonSelect = forwardRef<TGroupSelectImperativeRef, ILessonSelectProps>(({onChange, value, ...props}, ref) => {
+    const handleSearch = useCallback(
+      async (search?: string) => {
+        const fetchData = async () => {
+          const params: TQueryParams = {
+            limit: PAGE_SIZE,
+          };
+          if (search) params.filter = JSON.stringify({ name: search });
 
-  useEffect(() => {
-    console.log('fetching data in effect');
+          const response = await getLessons(params);
+          const groupList = response.data.list
+          const newLessons = groupList.map((item) => ({
+            value: item._id,
+            label: item.name,
+          }));
+          return newLessons;
+        };
 
-    const fetchData = async () => {
-      const response = await getLessons();
-      const data = response.data as TGroupType[];
-      const newLessons = data.map((item) => ({
-        value: item._id,
-        label: item.name,
-      }));
-      setLessons(newLessons);
-    };
+        return fetchData();
+      },
+      [],
+    )
 
-    fetchData();
-  }, []);
-
-  useImperativeHandle(ref, () => {
-    return {
-      updateNewGroupValue(data: DefaultOptionType) {
-        setIntervalValue(data.value as string);
-        setLessons(prev => ([data, ...(prev || [])]))
-      }
-    };
-  }, []);
-
-  const handleChange = (value: string) => {
-    if (value === undefined) setIntervalValue(value);
-    onChange?.(value);
-  };
 
   return (
-    <Select
+    <DebounceSelect
       {...props}
-      value={intervalValue}
-      onChange={handleChange}
-      options={lessons}
+      ref={ref}
       showSearch
-      // onSearch={handleSearch}
+      onChange={onChange}
+      value={value}
+      fetchOptions={handleSearch}
     />
-  );
-});
-
-export default LessonSelect;
+  )
+}
+);
+export default LessonSelect
