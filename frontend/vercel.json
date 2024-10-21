@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "${env.NEXT_PUBLIC_BACKEND_ENDPOINT}/$1"
+      "destination": "https://vocabularies-app.onrender.com/api/$1"
     }
   ]
 }
