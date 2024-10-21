@@ -2,7 +2,7 @@ require('dotenv').config();
 const process = require("process"); // Add this line to import the 'process' module
 
 // Get the allowed origins from .env and split them into an array
-const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : [];
+// const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : [];
 
 const corsOptions = {
     // origin: (origin, callback) => {
