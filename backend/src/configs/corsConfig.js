@@ -5,17 +5,18 @@ const process = require("process"); // Add this line to import the 'process' mod
 const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : [];
 
 const corsOptions = {
-    origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
+    // origin: (origin, callback) => {
+    //     // Allow requests with no origin (like mobile apps or curl requests)
+    //     if (!origin) return callback(null, true);
     
-        // Check if the origin is in the list of allowed origins
-        if (allowedOrigins.indexOf(origin) !== -1) {
-          callback(null, true);
-        } else {
-          callback(new Error('Not allowed by CORS: ' + origin));
-        }
-      },
+    //     // Check if the origin is in the list of allowed origins
+    //     if (allowedOrigins.indexOf(origin) !== -1) {
+    //       callback(null, true);
+    //     } else {
+    //       callback(new Error('Not allowed by CORS: ' + origin));
+    //     }
+    //   },
+    origin: process.env.FRONTEND_URL,
     // methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
 };
