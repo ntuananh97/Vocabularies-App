@@ -7,6 +7,8 @@ const { returnInternalErrorResponse, returnInvalidErrorResponse } = require("../
 const createWord = async (req, res) => {
   // validate
   try {
+    console.log("createWord ~ createWord: route", )
+
     const requiredFields = validateRequiredInput(req.body, [
       "title",
       "keyWord",
@@ -34,6 +36,7 @@ const createWord = async (req, res) => {
       status: statusMessage,
     });
   } catch(error) {
+    console.log("createWord ~ error:", error)
     return returnInternalErrorResponse(res, {error: error.message});
   }
 };
@@ -58,6 +61,8 @@ const getWords = async (req, res) => {
 
 const updateOnlyInfoWord = async (req, res) => {
   try {
+    console.log("updateOnlyInfoWord ~ updateOnlyInfoWord: route", )
+
     const updateId = req.params.id;
 
 
@@ -85,7 +90,8 @@ const updateOnlyInfoWord = async (req, res) => {
       message,
       status: statusMessage,
     });
-  } catch {
+  } catch (error) {
+    console.log("updateOnlyInfoWord ~ error:", error)
     return returnInternalErrorResponse(res);
   }
 };
