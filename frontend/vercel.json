@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://api.myanki.xyz/api/$1"
+      "destination": "https://vocabularies-app.onrender.com/api/$1"
     }
   ]
 }
