@@ -10,7 +10,7 @@ import { handleErrorResponse, handleSuccessResponse } from '@/helpers/response';
 import { getWords, markWordAsReviewed } from '@/services/word';
 import { TTopicType } from '@/types/topic';
 import { TSearchWordParams, TWordSearchForm, TWordType } from '@/types/word';
-import { Button, Switch, Table, TableProps, Tooltip } from 'antd';
+import { Button, Flex, Grid, Image, Switch, Table, TableProps, Tooltip } from 'antd';
 import {
   EditOutlined,
   CheckOutlined,
@@ -28,12 +28,13 @@ import PageContentTitle from '@/components/PageContentLayout/PageContentTitle';
 interface IReviewProps {
   topicData: TTopicType;
 }
-
+const { useBreakpoint } = Grid;
 const initialEditWordData = {} as TWordType;
-const ATTRIBUTES = "title,keyWord,pronounciation,definition,reviewCount,updatedAt";
+const ATTRIBUTES = "title,keyWord,pronounciation,definition,reviewCount,updatedAt,examples,images";
 
 const Review: React.FC<IReviewProps> = ({ topicData }) => {
   const topicId = topicData._id;
+  const screens = useBreakpoint();
 
   const [isOpenWordModal, setIsOpenWordModal] = useState(false);
   const [isOpenWordInfoModal, setIsOpenWordInfoModal] = useState(false);
@@ -197,16 +198,47 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
       dataIndex: 'title',
       key: 'title',
       fixed: 'left',
-      render: (text, item) => <SpeakTextWrapper text={text} className='justify-between'>
-      <Button onClick={() => openWordInfoModal(item)} type="text">{text}</Button>
-    </SpeakTextWrapper>,
+      width: screens.lg ? '20%' : 180,
+      render: (text, item) => {
+        const { images } = item;
+        const firstImage = images?.[0];
+        return (
+          <SpeakTextWrapper text={text} className="justify-between">
+            <Flex align='center' gap="small">
+              {firstImage && (
+                <img
+                  src={firstImage}
+                  alt={text}
+                  className='object-cover w-[30px] h-[30px] flex-shrink-0 rounded-[50%]'
+                />
+              )}
+
+              <Button
+                style={{
+                  textWrap: 'wrap',
+                  textAlign: 'left',
+                  background: 'none',
+                  height: 'auto',
+                  padding: 0,
+                }}
+                onClick={() => openWordInfoModal(item)}
+                type="text"
+              >
+                {text}
+              </Button>
+            </Flex>
+
+          </SpeakTextWrapper>
+        )
+      },
     },
     {
       title: 'Word',
       dataIndex: 'keyWord',
       key: 'keyWord',
-      render: (text) => <SpeakTextWrapper text={text} className='justify-between' />,
-
+      render: (text) => (
+        <SpeakTextWrapper text={text} className="justify-between" />
+      ),
     },
 
     {
@@ -218,6 +250,12 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
       title: 'Definition',
       dataIndex: 'definition',
       key: 'definition',
+    },
+    {
+      title: 'Example Count',
+      dataIndex: 'examples',
+      key: 'examples',
+      render: (examples) => examples?.length || 0,
     },
     {
       title: 'Review Count',
@@ -234,12 +272,20 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
     {
       key: 'action',
       render: (_, record) => (
-        <div className='flex items-center gap-1'>
+        <div className="flex items-center gap-1">
           <Tooltip title="Edit">
-            <Button onClick={() => openWordModal(record)} type='text' icon={<EditOutlined />} />
+            <Button
+              onClick={() => openWordModal(record)}
+              type="text"
+              icon={<EditOutlined />}
+            />
           </Tooltip>
           <Tooltip title="Review">
-            <Button onClick={() => handleReview(record._id)} type='text' icon={<CheckOutlined />} />
+            <Button
+              onClick={() => handleReview(record._id)}
+              type="text"
+              icon={<CheckOutlined />}
+            />
           </Tooltip>
           <MoreAction />
         </div>
@@ -279,7 +325,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
           dataSource={reviewWords}
           rowKey="_id"
           loading={loading}
-          scroll={{ x: 'max-content' }}
+          scroll={{ x: 1000, y: screens.lg ? 500 : 400 }}
           onChange={handleTableChange}
           pagination={{
             pageSize: PAGE_SIZE,

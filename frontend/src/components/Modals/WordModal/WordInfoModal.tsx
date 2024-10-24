@@ -5,6 +5,7 @@ import { TWordType } from '@/types/word';
 import { formatDate } from '@/utils/date';
 import {
   Descriptions,
+  Flex,
   Image,
   List,
   Modal,
@@ -55,7 +56,7 @@ const WordInfoModal: React.FC<TWordInfoModal> = ({
     onCancel?.();
   };
 
-  const firstImageUrl = wordInfo.images?.[0] ;
+  const {images} = wordInfo;
 
   return (
     <Modal
@@ -67,7 +68,17 @@ const WordInfoModal: React.FC<TWordInfoModal> = ({
     >
       {wordInfo._id ? (
         <div>
-          {firstImageUrl && <Image src={firstImageUrl} className="w-24 h-24 object-cover" />}
+          {images?.length > 0 && (
+            <Flex gap="middle" align="center">
+              <Image.PreviewGroup items={images}>
+                <Image src={images[0]} />
+              </Image.PreviewGroup>
+
+              {images.length - 1 > 0 && <Tag color='magenta'> +{images.length - 1} </Tag>}
+            </Flex>
+          )}
+
+          {/* {firstImageUrl && <Image src={firstImageUrl} className="w-24 h-24 object-cover" />} */}
           <div className="flex items-center gap-2">
             <SpeakTextWrapper text={wordInfo.keyWord}>
               <Title level={2}>{wordInfo.keyWord}</Title>
@@ -79,16 +90,18 @@ const WordInfoModal: React.FC<TWordInfoModal> = ({
               <Tag color="magenta">{wordInfo.lesson.name}</Tag>
             )}
           </div>
-          <Descriptions bordered layout='vertical' column={3}>
+          <Descriptions bordered layout="vertical" column={3}>
             {wordInfo.definition && (
               <Descriptions.Item label="Definition" span={3}>
                 {wordInfo.definition}
               </Descriptions.Item>
             )}
-            <Descriptions.Item label="Review count"  span={1}>
+            <Descriptions.Item label="Review count" span={1}>
               {wordInfo.reviewCount}
             </Descriptions.Item>
-            <Descriptions.Item label="Step" span={2}>{wordInfo.step}</Descriptions.Item>
+            <Descriptions.Item label="Step" span={2}>
+              {wordInfo.step}
+            </Descriptions.Item>
             <Descriptions.Item label="Description" span={3}>
               {wordInfo.description}
             </Descriptions.Item>
@@ -106,9 +119,14 @@ const WordInfoModal: React.FC<TWordInfoModal> = ({
                 <List
                   bordered
                   dataSource={wordInfo.examples}
-                  renderItem={(item) => <List.Item>
-                    <SpeakTextWrapper text={item} className='justify-between' />
-                  </List.Item>}
+                  renderItem={(item) => (
+                    <List.Item>
+                      <SpeakTextWrapper
+                        text={item}
+                        className="justify-between"
+                      />
+                    </List.Item>
+                  )}
                 />
               </Descriptions.Item>
             )}

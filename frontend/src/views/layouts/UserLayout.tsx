@@ -33,6 +33,7 @@ const UserLayout: React.FC<UserLayoutProps> = ({ children }) => {
             margin: '24px 16px',
             padding: 15,
             background: colorBgContainer,
+            overflow: 'auto',
           }}
         >
           {children}
