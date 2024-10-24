@@ -1,13 +1,15 @@
 const cron = require("cron");
 const process = require("process"); // Add this line to import the 'process' module
 const https = require("https");
-
+const dayjs = require("dayjs");
 
 const URL = process.env.DOMAIN_PRODUCT_BACKEND;
 
-const sendPostRequest = async () => {
+const runHealthCheck = async () => {
+  const url = `${URL}/health-check`
+  console.log("Run health check: ", url);
   https
-  .get(URL, (res) => {
+  .get(url, (res) => {
     if (res.statusCode === 200) {
       console.log("GET request sent successfully");
     } else {
@@ -20,7 +22,13 @@ const sendPostRequest = async () => {
   };
 
 const job = new cron.CronJob("*/14 * * * *", function () {
-	sendPostRequest()
+  // Disable health check during the night in Vietnam timezone
+	const currentHour = dayjs().tz("Asia/Ho_Chi_Minh").hour();
+  if (currentHour >= 7 && currentHour < 24) {
+    runHealthCheck();
+  } else {
+    console.log("Health check skipped: Out of allowed time range (12 AM - 7 AM)");
+  }
 });
 
 module.exports = job;

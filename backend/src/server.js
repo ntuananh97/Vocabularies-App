@@ -10,6 +10,8 @@ const routes = require("./routes");
 const fileUpload = require('express-fileupload');
 const process = require("process"); // Add this line to import the 'process' module
 const corsOptions = require("./configs/corsConfig");
+const { checkProduction } = require("./utils");
+const job = require("./cron");
 
 
 const app = express();
@@ -18,9 +20,9 @@ const server = http.createServer(app) // thiết lập socket io cho sau này
 dotenv.config();
 
 // Start cron job
-// if (checkProduction()) {
-//     job.start();
-// }
+if (checkProduction()) {
+    job.start();
+}
 
 // Configure CORS
 app.use(cors(corsOptions));

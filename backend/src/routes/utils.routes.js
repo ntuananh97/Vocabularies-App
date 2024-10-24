@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 // The route is only for cron job to avoid the railway server sleep
-router.post("/post-job", (req, res) => {
-    res.send("Upload Single File");
+router.get("/health-check", (req, res) => {
+    res.send("I'm super healthy! You don't need to worry about me.");
 });
 
 module.exports = router;

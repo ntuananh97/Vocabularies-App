@@ -190,9 +190,17 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
     fetchData(newParams)
   };
 
+  const countIndexInTable = (index: number) => (pagination.current - 1) * PAGE_SIZE + index + 1;
+
   const checked = params.useReviewToday === ENABLE_USE_REVIEW;
 
   const columns: TableProps<TWordType>['columns'] = [
+    {
+      title: '#',
+      key: 'index',
+      render: (_, __, index) => countIndexInTable(index),
+      width: 50,
+    },
     {
       title: 'Sentence',
       dataIndex: 'title',
@@ -209,7 +217,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
                 <img
                   src={firstImage}
                   alt={text}
-                  className='object-cover w-[30px] h-[30px] flex-shrink-0 rounded-[50%]'
+                  className='object-cover w-12 h-12 flex-shrink-0 rounded-[50%]'
                 />
               )}
 
