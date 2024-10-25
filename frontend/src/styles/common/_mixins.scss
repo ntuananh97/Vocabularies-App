@@ -1,0 +1,7 @@
+@mixin remember-word-color {
+  @apply text-blue-600 !important;
+}
+
+@mixin remember-sentence-color {
+  @apply text-orange-500 !important;
+}

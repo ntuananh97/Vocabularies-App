@@ -15,7 +15,7 @@ const PeriodSelect: React.FC<IPeriodSelectProps> = ({
 }) => {
 
     const [periods, setPeriods] = useState<SelectProps['options']>([]);
-    const [intervalValue, setIntervalValue] = useState("")
+    const [intervalValue, setIntervalValue] = useState<string | undefined>(undefined)
 
     useEffect(() => {
       if (value !== undefined) setIntervalValue(value);
@@ -23,25 +23,24 @@ const PeriodSelect: React.FC<IPeriodSelectProps> = ({
     
 
     useEffect(() => {
-        const  fetchData = async () => {
-            const response = await getPeriods();
-            const data = response.data as TPeriodType[];
-            const newPeriods = data.map((period) => ({
-                value: period.step.toString(),
-                label: period.name, 
-            }))
-            setPeriods(newPeriods);
-        }
+      const fetchData = async () => {
+        const response = await getPeriods();
+        const data = response.data as TPeriodType[];
 
-        fetchData();
-    
-      
-    }, [])
+        const newPeriods = data.map((period) => ({
+          value: period.step.toString(),
+          label: `${period.name} (${period.step - 1} review count)`,
+        }));
+        setPeriods(newPeriods);
+      };
+
+      fetchData();
+    }, []);
     
 
-  const handleChange = (value: string) => {
-    if (value === undefined) setIntervalValue(value);
-    onChange?.(value);
+  const handleChange = (val: string) => {
+    if (value === undefined) setIntervalValue(val);
+    onChange?.(val);
   };
 
   return (

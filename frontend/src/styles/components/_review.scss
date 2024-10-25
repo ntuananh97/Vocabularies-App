@@ -1,0 +1,24 @@
+@use '../common/mixins' as *;
+
+.remember-word-color {
+    @include remember-word-color;
+  }
+  
+  .remember-sentence-color {
+    @include remember-sentence-color;
+  }
+
+.speak-text {
+    &__word {
+        @include remember-word-color;
+        
+        button, svg {
+            @include remember-word-color;
+        }
+    }
+    &__sentence {
+        button {
+            @include remember-sentence-color;
+        }
+    }
+}

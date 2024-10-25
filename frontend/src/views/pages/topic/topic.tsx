@@ -9,6 +9,7 @@ import { useStore } from '@/store';
 import { TTopicType } from '@/types/topic';
 import { Button, List } from 'antd';
 import React, { useEffect, useState } from 'react'
+import { REVIEW_TOPICS_BREADCRUMB } from './constants';
 
 const inititalTopicData = {} as TTopicType
 
@@ -37,12 +38,13 @@ const Topic = () => {
   return (
     <>
       <PageContentLayout
-        title="List of Topics"
+        title="Review Topics"
         action={
           <Button type="primary" onClick={() => openTopicModal()}>
             Add topic
           </Button>
         }
+        breadCrumbItems={[{title: REVIEW_TOPICS_BREADCRUMB}]}
       >
         <List
           className="demo-loadmore-list"

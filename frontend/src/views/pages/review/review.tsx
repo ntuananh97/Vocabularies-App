@@ -24,6 +24,9 @@ import MoreAction from './MoreAction';
 import WordInfoModal from '@/components/Modals/WordModal/WordInfoModal';
 import PageContentLayout from '@/components/PageContentLayout';
 import PageContentTitle from '@/components/PageContentLayout/PageContentTitle';
+import NavLink from '@/app/nav-link';
+import { REVIEW_TOPICS_BREADCRUMB } from '../topic/constants';
+import { ROUTE_CONFIG } from '@/configs/route';
 
 interface IReviewProps {
   topicData: TTopicType;
@@ -211,7 +214,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
         const { images } = item;
         const firstImage = images?.[0];
         return (
-          <SpeakTextWrapper text={text} className="justify-between">
+          <SpeakTextWrapper text={text} className="justify-between speak-text__sentence">
             <Flex align='center' gap="small">
               {firstImage && (
                 <img
@@ -245,7 +248,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
       dataIndex: 'keyWord',
       key: 'keyWord',
       render: (text) => (
-        <SpeakTextWrapper text={text} className="justify-between" />
+        <SpeakTextWrapper text={text} className="justify-between speak-text__word" />
       ),
     },
 
@@ -319,6 +322,18 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
             </div>
           </div>
         }
+        breadCrumbItems={[
+          {
+            title: (
+              <NavLink href={ROUTE_CONFIG.TOPIC}>
+                {REVIEW_TOPICS_BREADCRUMB}
+              </NavLink>
+            ),
+          },
+          {
+            title: topicData.name,
+          },
+        ]}
       >
         <div className="mb-5">
           <WordSearch
@@ -333,7 +348,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
           dataSource={reviewWords}
           rowKey="_id"
           loading={loading}
-          scroll={{ x: 1000, y: screens.lg ? 500 : 400 }}
+          scroll={{ x: 1000 }}
           onChange={handleTableChange}
           pagination={{
             pageSize: PAGE_SIZE,
