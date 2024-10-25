@@ -5,13 +5,14 @@ import { PlusOutlined } from '@ant-design/icons';
 import GroupModal from '../Modals/GroupModal';
 import { TGroupSelectImperativeRef } from '@/types/createFast';
 import { DefaultOptionType } from 'antd/es/select';
+import { ISelectProps } from '@/types/select';
 
-interface CreateGroupFastProps {
+interface CreateGroupFastProps extends Pick<ISelectProps, 'labelOfValue'> {
   onChange?: (_value: string) => void;
   value?: string;
 }
 
-const CreateGroupFast: React.FC<CreateGroupFastProps> = ({onChange, value}) => {
+const CreateGroupFast: React.FC<CreateGroupFastProps> = ({onChange, value, labelOfValue}) => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const selectRef = useRef<TGroupSelectImperativeRef>(null)
 
@@ -31,7 +32,14 @@ const CreateGroupFast: React.FC<CreateGroupFastProps> = ({onChange, value}) => {
   return (
     <>
       <Space.Compact style={{ width: '100%' }}>
-        <LessonSelect allowClear ref={selectRef} onChange={onChange} value={value} placeholder="Type to search group" />
+        <LessonSelect
+          allowClear
+          ref={selectRef}
+          onChange={onChange}
+          value={value}
+          placeholder="Type to search group"
+          labelOfValue={labelOfValue}
+        />
         <Tooltip title="Create new group">
           <Button
             type="primary"
@@ -40,7 +48,11 @@ const CreateGroupFast: React.FC<CreateGroupFastProps> = ({onChange, value}) => {
           />
         </Tooltip>
       </Space.Compact>
-      <GroupModal onCancel={handleCloseModal} visible={isOpenModal} onFetchNewData={handleUpdateNewData} />
+      <GroupModal
+        onCancel={handleCloseModal}
+        visible={isOpenModal}
+        onFetchNewData={handleUpdateNewData}
+      />
     </>
   );
 };

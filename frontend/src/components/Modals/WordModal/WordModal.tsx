@@ -25,6 +25,7 @@ const WordModal: React.FC<TWordModal> = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [lessonLabelInSelect, setLessonLabelInSelect] = useState("")
 
   const editDataId = editData._id;
   const isEdit = !!editDataId;
@@ -56,6 +57,7 @@ const WordModal: React.FC<TWordModal> = ({
           localImages,
           localExamples,
         });
+        setLessonLabelInSelect(detailWord.lessonId?.name || "")
       } catch (error) {
         handleErrorResponse(error);
       }
@@ -101,6 +103,7 @@ const WordModal: React.FC<TWordModal> = ({
   const handleCancel = () => {
     onCancel?.();
     form.resetFields();
+    setLessonLabelInSelect("")
   };
 
   return (
@@ -177,7 +180,7 @@ const WordModal: React.FC<TWordModal> = ({
         </Col>
         <Col xs={24} md={12}>
           <Form.Item<TWordFormDataType> label="Group" name="lessonId">
-            <CreateGroupFast />
+            <CreateGroupFast labelOfValue={lessonLabelInSelect} />
           </Form.Item>
         </Col>
         <Col xs={24}>

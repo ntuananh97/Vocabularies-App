@@ -1,5 +1,7 @@
 
-export const PAGE_SIZE = 10;
+export const PAGE_SIZE = 20;
+
+export const PAGE_SIZE_SELECT = 10
 
 export const SORT_TYPE = {
     ASC: 'asc',

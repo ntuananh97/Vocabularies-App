@@ -3,13 +3,7 @@ import { Select, SelectProps, Spin } from 'antd';
 import { DefaultOptionType } from 'antd/es/select';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import debounce from 'lodash/debounce';
-
-interface ISelectProps extends SelectProps {
-  onChange?: (_value: string) => void;
-  value?: string;
-  debounceTimeout?: number;
-  fetchOptions: (search?: string) => Promise<DefaultOptionType[]>;
-}
+import { ISelectProps } from '@/types/select';
 
 const DEBOUNCE_TIMEOUT = 500; // ms
 
@@ -18,6 +12,7 @@ const DebounceSelect = forwardRef<TGroupSelectImperativeRef, ISelectProps>(({
   value,
   debounceTimeout = DEBOUNCE_TIMEOUT,
   fetchOptions,
+  labelOfValue,
   ...props
 }, ref) => {
   const [options, setOptions] = useState<SelectProps['options']>([]);
@@ -53,6 +48,29 @@ const DebounceSelect = forwardRef<TGroupSelectImperativeRef, ISelectProps>(({
       debouncedFetchOptions.cancel();
     };
   }, [debouncedFetchOptions]);
+
+  
+  // Add new option if not exist
+  useEffect(() => {
+
+    const addNewOptionIfNotExist = () => {
+      if (!value || !labelOfValue) return;
+
+      const isValueExist = options?.some(option => option.value === value);
+      if (isValueExist) return
+
+      const newOption: DefaultOptionType = {
+        value,
+        label: labelOfValue
+      }
+
+      setOptions(prev => ([newOption, ...(prev || [])]))
+    }
+
+    addNewOptionIfNotExist();
+
+  }, [value, labelOfValue, options])
+  
 
   useImperativeHandle(ref, () => {
     return {

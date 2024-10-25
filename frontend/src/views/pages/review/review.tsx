@@ -10,7 +10,7 @@ import { handleErrorResponse, handleSuccessResponse } from '@/helpers/response';
 import { getWords, markWordAsReviewed } from '@/services/word';
 import { TTopicType } from '@/types/topic';
 import { TSearchWordParams, TWordSearchForm, TWordType } from '@/types/word';
-import { Button, Flex, Grid, Image, Switch, Table, TableProps, Tooltip } from 'antd';
+import { Button, Flex, Grid, Switch, Table, TableProps, Tooltip } from 'antd';
 import {
   EditOutlined,
   CheckOutlined,
@@ -58,8 +58,6 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
 
   const [params, setParams] = useState<TSearchWordParams>({
     useReviewToday: ENABLE_USE_REVIEW,
-    page: 1,
-    pageSize: PAGE_SIZE,
     sort: { reviewCount: SORT_TYPE.ASC, updatedAt: SORT_TYPE.DESC },
   });
 
@@ -73,8 +71,8 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
 
     // Pagination
     const FIRST_PAGE = 1;
-    const newPage = searchParams?.page || params.page || FIRST_PAGE;
-    const newPageSize = (searchParams?.pageSize || params.pageSize) as number;
+    const newPage = searchParams?.page || pagination.current || FIRST_PAGE;
+    const newPageSize = (searchParams?.pageSize || PAGE_SIZE) as number;
 
     // Sort
     const searchParamSort = searchParams?.sort || {};
