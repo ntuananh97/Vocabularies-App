@@ -5,7 +5,7 @@ const https = require("https");
 const URL = process.env.DOMAIN_PRODUCT_BACKEND;
 
 const runHealthCheck = async () => {
-  const url = `${URL}/health-check`
+  const url = `${URL}/api/health-check`
   console.log("Run health check: ", url);
   https
   .get(url, (res) => {
