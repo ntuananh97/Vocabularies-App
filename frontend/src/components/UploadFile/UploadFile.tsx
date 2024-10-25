@@ -7,6 +7,7 @@ import { API_ENDPOINTS } from '@/configs/api';
 import { useEffect, useMemo, useState } from 'react';
 import { generateUniqueId } from '@/utils';
 import { MAX_URL_LENGTH } from '@/configs/constants';
+import { SortableFileList } from './SortableFileList';
 
 const getUploadAction = () => `${BASE_URL}${API_ENDPOINTS.UPLOAD.SINGLE}`;
 
@@ -85,29 +86,17 @@ const UploadFile: React.FC<IUploadFileProps> = ({value, onChange, accept}) => {
     setUrlTextLink("")
   }
 
+  const handleSortEnd = (newFileList: TFileListType[]) => {
+    handleChangeProps(newFileList);
+  }
+
   return (
     <div>
-      <ul className="flex items-center gap-1">
-        {fileList.map((file) => (
-          <li key={file.id}>
-            <div className="w-20 h-20 relative">
-              <img
-                className="w-full h-full object-cover"
-                src={file.url}
-                alt="image"
-              />
-
-              <div className="absolute top-0 right-0">
-                <Button
-                  type="text"
-                  icon={<CloseOutlined />}
-                  onClick={() => handleRemoveFile(file.id)}
-                />
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <SortableFileList
+        fileList={fileList}
+        onChange={handleSortEnd}
+        onRemoveFile={handleRemoveFile}
+      />
 
       <div className="mt-4 flex flex-col gap-5">
         <Upload
@@ -123,7 +112,7 @@ const UploadFile: React.FC<IUploadFileProps> = ({value, onChange, accept}) => {
           </Button>
         </Upload>
 
-        <div className='w-full'>
+        <div className="w-full">
           <Space.Compact style={{ width: '100%' }}>
             <Input
               count={{
@@ -141,7 +130,9 @@ const UploadFile: React.FC<IUploadFileProps> = ({value, onChange, accept}) => {
               onClick={handleAddUrlTextLink}
             />
           </Space.Compact>
-          {!isValidUrlLink && <p className="text-red-600 text-xs mt-1">Invalid url</p>}
+          {!isValidUrlLink && (
+            <p className="text-red-600 text-xs mt-1">Invalid url</p>
+          )}
         </div>
       </div>
     </div>
