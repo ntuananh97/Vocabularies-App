@@ -1,7 +1,8 @@
 import { API_ENDPOINTS } from '@/configs/api';
 import axiosInstance from '@/helpers/axios';
 import { handleAxiosError } from '@/helpers/axios/handleError';
-import { TApiSearchWordParams, TWordFormDataType } from '@/types/word';
+import { TApiResponse } from '@/types/common';
+import { TApiSearchWordParams, TReviewMultipleWordsBody, TReviewMultipleWordsResponseData, TWordFormDataType } from '@/types/word';
 
 export const getWords = async (params: TApiSearchWordParams) => {
   try {
@@ -39,6 +40,23 @@ export const markWordAsReviewed = async (updatedId: string) => {
   } catch (error) {
     handleAxiosError(error);
   }
+};
+
+export const markMultipleWordsAsReviewed = async (
+  data: TReviewMultipleWordsBody
+): Promise<TApiResponse<TReviewMultipleWordsResponseData>> => {
+  try {
+    const res = await axiosInstance.put(
+      `${API_ENDPOINTS.WORD.MULTIPLE_MARK}`,
+      data
+    );
+    return res.data;
+  } catch (error) {
+    handleAxiosError(error);
+  }
+
+  // This should never happen because handleAxiosError always throws an error
+  throw new Error('This should never happen');
 };
 
 export const getDetailWord = async (updatedId: string) => {

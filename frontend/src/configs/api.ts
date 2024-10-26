@@ -13,6 +13,7 @@ export const API_ENDPOINTS = {
     WORD: {
         INDEX: `/words`,
         MARK: `/words/markAsReviewed`,
+        MULTIPLE_MARK: `/words/markMultipleAsReviewed`,
     },
     PERIOD: {
         INDEX: `/periods`,

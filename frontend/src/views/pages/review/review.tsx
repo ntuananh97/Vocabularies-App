@@ -7,7 +7,7 @@ import {
   SORT_TYPE,
 } from '@/configs/constants';
 import { handleErrorResponse, handleSuccessResponse } from '@/helpers/response';
-import { getWords, markWordAsReviewed } from '@/services/word';
+import { getWords, markMultipleWordsAsReviewed, markWordAsReviewed } from '@/services/word';
 import { TTopicType } from '@/types/topic';
 import { TSearchWordParams, TWordSearchForm, TWordType } from '@/types/word';
 import { Button, Flex, Grid, Switch, Table, TableProps, Tooltip } from 'antd';
@@ -28,6 +28,8 @@ import NavLink from '@/app/nav-link';
 import { REVIEW_TOPICS_BREADCRUMB } from '../topic/constants';
 import { ROUTE_CONFIG } from '@/configs/route';
 
+type TableRowSelection<T extends object = object> = TableProps<T>['rowSelection'];
+
 interface IReviewProps {
   topicData: TTopicType;
 }
@@ -44,6 +46,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
   const [loading, setLoading] = useState(false);
   const [reviewWords, setReviewWords] = useState<TWordType[]>([]);
 
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [editTopicData, setEditTopicData] =
     useState<TWordType>(initialEditWordData);
   const [pagination, setPagination] = useState<{
@@ -111,6 +114,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
       const { list, totalCount } = response.data;
       setReviewWords(list);
       setPagination({ ...pagination, current: newPage, total: totalCount });
+      resetSelectedRowKeys()
     } catch (error) {
       handleErrorResponse(error);
     }
@@ -127,6 +131,9 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
     handleFetchData();
   }, []);
 
+  const resetSelectedRowKeys = () => {
+    setSelectedRowKeys([]);
+  }
 
   const openWordModal = (item?: TWordType) => {
     setIsOpenWordModal(true);
@@ -193,7 +200,39 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
 
   const countIndexInTable = (index: number) => (pagination.current - 1) * PAGE_SIZE + index + 1;
 
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const handleMarkMultilpleWordsAsReviewed = async () => {
+    if (loading) return;
+
+    const selectedRowKeysLength = selectedRowKeys.length;
+
+    try {
+      const response = await markMultipleWordsAsReviewed({
+        ids: selectedRowKeys.join(','),
+      });
+
+      const { modifiedCount } = response.data;
+      const messageResponse =
+        modifiedCount < selectedRowKeysLength
+          ? 'Some words are not marked as reviewed'
+          : 'All words are marked as reviewed';
+      handleSuccessResponse(messageResponse);
+
+      handleFetchData();
+    } catch (error) {
+      handleErrorResponse(error);
+    }
+  }
+
   const checked = params.useReviewToday === ENABLE_USE_REVIEW;
+
+  const rowSelection: TableRowSelection<TWordType> = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
 
   const columns: TableProps<TWordType>['columns'] = [
     {
@@ -306,9 +345,24 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
     <>
       <PageContentLayout
         action={
-          <Button type="primary" onClick={() => openWordModal()}>
-            Add Word
-          </Button>
+          <div className="flex items-center gap-1">
+            {selectedRowKeys.length > 0 && (
+              <Tooltip title="Review all words that have marked">
+                <Button
+                  color="default"
+                  variant="solid"
+                  type="primary"
+                  onClick={handleMarkMultilpleWordsAsReviewed}
+                >
+                  Review Word
+                </Button>
+              </Tooltip>
+            )}
+
+            <Button type="primary" onClick={() => openWordModal()}>
+              Add Word
+            </Button>
+          </div>
         }
         customHeader={
           <div className="flex flex-col lg:flex-row lg:items-center gap-2">
@@ -347,6 +401,7 @@ const Review: React.FC<IReviewProps> = ({ topicData }) => {
           rowKey="_id"
           loading={loading}
           scroll={{ x: 1000 }}
+          rowSelection={rowSelection}
           onChange={handleTableChange}
           pagination={{
             pageSize: PAGE_SIZE,

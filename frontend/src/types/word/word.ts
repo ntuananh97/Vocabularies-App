@@ -58,4 +58,12 @@ export type TWordFormDataType = Partial<TWordType> & {
   localExamples?: TInputListType[];
 }
 
+export type TReviewMultipleWordsBody = {
+  ids: string
+}
+
+export type TReviewMultipleWordsResponseData = {
+  modifiedCount: number
+}
+
 

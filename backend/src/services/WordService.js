@@ -282,6 +282,107 @@ const markAsReviewed = (updateId) => {
   });
 };
 
+const markMultipleAsReviewed = (updateIds) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log("markMultipleAsReviewed ~ updateIds", updateIds);
+      const updatedWordIdsInArr = updateIds.split(",");
+      console.log(
+        "returnnewPromise ~ updatedWordIdsInArr:",
+        updatedWordIdsInArr
+      );
+
+      // Tìm tất cả các từ cần cập nhật
+      const words = await Word.find({ _id: { $in: updatedWordIdsInArr } });
+
+      if (words.length === 0) {
+        resolve({
+          status: CONFIG_MESSAGE_ERRORS.INVALID.status,
+          message: "Not found any word to update",
+          typeError: CONFIG_MESSAGE_ERRORS.INVALID.type,
+          data: null,
+          statusMessage: "Error",
+        });
+        return;
+      }
+
+      // Lấy tất cả các bước hiện tại để tìm Period một cách hiệu quả
+      const currentSteps = words.map((word) => word.step);
+      const uniqueSteps = [...new Set(currentSteps)];
+      const stepsToFind = uniqueSteps.concat(
+        uniqueSteps.map((step) => step + 1)
+      );
+      const periods = await Period.find({ step: { $in: stepsToFind } });
+
+      // Tạo một map để truy xuất Period nhanh hơn
+      const periodMap = {};
+      periods.forEach((period) => {
+        periodMap[period.step] = period;
+      });
+
+      // Tạo các thao tác cập nhật cho bulkWrite
+      const bulkOperations = words.map((word) => {
+        const currentStep = word.step;
+        let nextPeriod = periodMap[currentStep + 1];
+
+        // Nếu không tìm thấy Period cho bước tiếp theo, sử dụng Period của bước hiện tại
+        if (!nextPeriod) {
+          nextPeriod = periodMap[currentStep];
+        }
+
+        // Recalculate nextReviewDate, reviewCount, step, reviewHistory
+        const nextViewDay = nextPeriod.nextViewDay;
+        const nextReviewDate = dayjs.utc().add(nextViewDay, "day").toDate();
+        const reviewCount = word.reviewCount + 1;
+        const step = nextPeriod.step;
+        const reviewHistory = [
+          ...word.reviewHistory,
+          {
+            reviewDate: dayjs.utc().toDate(),
+            step: currentStep,
+          },
+        ];
+
+        return {
+          updateOne: {
+            filter: { _id: word._id },
+            update: {
+              $set: {
+                nextReviewDate,
+                reviewCount,
+                step,
+                reviewHistory,
+              },
+            },
+          },
+        };
+      });
+
+      // Thực hiện bulkWrite với ordered: false để tiếp tục các thao tác dù có lỗi
+      const bulkWriteResult = await Word.bulkWrite(bulkOperations, {
+        ordered: false,
+      });
+
+      // Kiểm tra các lỗi nếu có
+      if (bulkWriteResult.hasWriteErrors()) {
+        const writeErrors = bulkWriteResult.getWriteErrors();
+        console.error("Có lỗi trong các thao tác bulkWrite:", writeErrors);
+        // Bạn có thể tùy chỉnh cách xử lý lỗi ở đây, ví dụ như lưu log hoặc thông báo cho người dùng
+      }
+
+      return resolve({
+        status: CONFIG_MESSAGE_ERRORS.ACTION_SUCCESS.status,
+        message: "updated successfully",
+        typeError: "",
+        data: bulkWriteResult,
+        statusMessage: "Success",
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 const getDetailWord = (updateId) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -316,5 +417,6 @@ module.exports = {
   getWords,
   updateOnlyInfoWord,
   markAsReviewed,
-  getDetailWord
+  getDetailWord,
+  markMultipleAsReviewed
 };

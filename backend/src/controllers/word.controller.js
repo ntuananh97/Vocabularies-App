@@ -114,6 +114,30 @@ const markAsReviewed = async (req, res) => {
   }
 };
 
+const markMultipleAsReviewed  = async (req, res) => {
+  try {
+    const updateIds = req.body.ids;
+
+    if (!updateIds) {
+      return returnInvalidErrorResponse(res, {
+        message: "The field [ids] is required",
+      });
+    }
+
+    const response = await WordService.markMultipleAsReviewed(updateIds);
+    const { data, status, typeError, message, statusMessage } = response;
+
+    return res.status(status).json({
+      typeError,
+      data,
+      message,
+      status: statusMessage,
+    });
+  } catch (error){
+    return returnInternalErrorResponse(res, {error: error.message});
+  }
+};
+
 const getDetailWord = async (req, res) => {
   try {
     const updateId = req.params.id;
@@ -137,5 +161,6 @@ module.exports = {
   getWords,
   updateOnlyInfoWord,
   markAsReviewed,
-  getDetailWord
+  getDetailWord,
+  markMultipleAsReviewed
 };
