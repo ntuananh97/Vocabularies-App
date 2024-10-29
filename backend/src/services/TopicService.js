@@ -1,19 +1,21 @@
 /* eslint-disable no-async-promise-executor */
 const { CONFIG_MESSAGE_ERRORS } = require("../configs/constants");
 const Topic = require("../models/topic.model");
+const { calcPagination } = require("../utils/query");
 
 const create = (newData, userId) => {
   return new Promise(async (resolve, reject) => {
-    const { name } = newData;
-    const trimedName = name.trim();
+    const { name, type } = newData;
+    const trimName = name.trim();
 
     try {
       const newDatas = {
-        name: trimedName,
-        userId
+        name: trimName,
+        userId,
+        type
       };
 
-      const checkTopic = await Topic.findOne({ name: trimedName , userId });
+      const checkTopic = await Topic.findOne({ name: trimName , userId, type });
       if (checkTopic) {
         return resolve({
           status: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.status,
@@ -49,11 +51,42 @@ const create = (newData, userId) => {
   });
 };
 
-const getList = () => {
+const getList = (req) => {
   return new Promise(async (resolve, reject) => {
     try {
-      // Get all data
-      const data = await Topic.find({});
+      const loggedInUser = req.user._id;
+      const {filter, limit, page} = req.query;
+      let query = filter ? JSON.parse(filter) : {};
+      query.userId = loggedInUser;
+
+      // Pagination
+      const {calcLimit, skip} = calcPagination(page, limit);
+
+      // Query
+      if (query.name) {
+        query.name = { $regex: query.name?.trim() || "", $options: "i" };
+      }
+
+      const topicQuery = [
+        { $match: query },
+      ]
+
+      const result = await Topic.aggregate([
+        ...topicQuery,
+        {
+          $facet: {
+            data: [{ $skip: skip }, { $limit: calcLimit }],
+            totalCount: [
+              { $count: "count" }    // Count total documents
+            ]
+          }
+        }
+      ]);
+
+      const data = {
+        list: result[0].data || [],
+        totalCount: result[0].totalCount?.[0]?.count || 0
+      };
 
       return resolve({
         status: CONFIG_MESSAGE_ERRORS.GET_SUCCESS.status,
@@ -88,7 +121,7 @@ const getOne = (topicId) => {
   });
 };
 
-const update = (updatedData = {}, updateId) => {
+const update = (updatedData = {}, updateId, userId) => {
   return new Promise(async (resolve, reject) => {
     try {
       const checkTopic = await Topic.findById(updateId);
@@ -106,7 +139,7 @@ const update = (updatedData = {}, updateId) => {
 
       if (updatedData.name) {
         const trimedName = updatedData.name.trim();
-        const checkExistedTopicName = await Topic.findOne({ name: trimedName });
+        const checkExistedTopicName = await Topic.findOne({ name: trimedName, userId, type: updatedData.type });
 
         if (checkExistedTopicName) {
           return resolve({

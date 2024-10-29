@@ -6,15 +6,19 @@ import PageContentLayout from '@/components/PageContentLayout';
 import { ROUTE_CONFIG } from '@/configs/route';
 import useTopic from '@/hooks/useTopic'
 import { useStore } from '@/store';
-import { TTopicType } from '@/types/topic';
+import { TReviewTopicType, TTopicType } from '@/types/topic';
 import { Button, List } from 'antd';
 import React, { useEffect, useState } from 'react'
 import { REVIEW_TOPICS_BREADCRUMB } from './constants';
 
+interface ITopicProps {
+  type: TReviewTopicType
+}
+
 const inititalTopicData = {} as TTopicType
 
-const Topic = () => {
-  const { getAllTopics, loading } = useTopic();
+const Topic: React.FC<ITopicProps> = ({type}) => {
+  const { getAllTopics, loading } = useTopic({type});
   const { topics } = useStore();
 
   const [isOpenTopicModal, setIsOpenTopicModal] = useState(false)
@@ -76,6 +80,8 @@ const Topic = () => {
         visible={isOpenTopicModal}
         onCancel={() => setIsOpenTopicModal(false)}
         editData={editTopicData}
+        onFetchData={fetchData}
+        type={type}
       />
     </>
   );

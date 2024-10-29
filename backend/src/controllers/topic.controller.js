@@ -8,6 +8,7 @@ const createTopic = async (req, res) => {
   try {
     const requiredFields = validateRequiredInput(req.body, [
       "name",
+      "type"
     ]);
 
     if (requiredFields.length > 0) {
@@ -50,7 +51,7 @@ const getTopics = async (req, res) => {
 const updateTopic = async (req, res) => {
   try {
     const updateId = req.params.id;
-
+    const userId = req.user._id;
 
     // Validate empty name
     if (req.body.name && !req.body.name.trim()) {
@@ -59,7 +60,17 @@ const updateTopic = async (req, res) => {
       });
     }
 
-    const response = await TopicService.update(req.body, updateId);
+    // Must have type
+    const requiredFields = validateRequiredInput(req.body, [
+      "type"
+    ]);
+    if (requiredFields.length > 0) {
+      return returnInvalidErrorResponse(res, {
+        message: `The field [${requiredFields[0]}] is required`,
+      });
+    }
+
+    const response = await TopicService.update(req.body, updateId, userId);
     const { data, status, typeError, message, statusMessage } = response;
 
     return res.status(status).json({
@@ -68,8 +79,8 @@ const updateTopic = async (req, res) => {
       message,
       status: statusMessage,
     });
-  } catch {
-    return returnInternalErrorResponse(res);
+  } catch (err) {
+    return returnInternalErrorResponse(res, {error: err.message});
   }
 };
 

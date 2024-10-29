@@ -8,6 +8,11 @@ const topicSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    type: {
+      type: String,
+      enum: ["review", "music"],
+      required: true,
+    },
   },
   {
     timestamps: true,

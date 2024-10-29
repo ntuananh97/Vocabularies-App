@@ -1,15 +1,21 @@
 import { API_ENDPOINTS } from '@/configs/api';
 import axiosInstance from '@/helpers/axios';
 import { handleAxiosError } from '@/helpers/axios/handleError';
-import { TTopicFormData } from '@/types/topic';
+import { TApiResponse, TGetListApiResponse, TQueryParams } from '@/types/common';
+import { TTopicFormData, TTopicType } from '@/types/topic';
 
-export const getTopics = async () => {
+export const getTopics = async (params?: TQueryParams): Promise<TApiResponse<TGetListApiResponse<TTopicType>>> => {
   try {
-    const res = await axiosInstance.get(API_ENDPOINTS.TOPIC.INDEX);
+    const res = await axiosInstance.get(API_ENDPOINTS.TOPIC.INDEX, {
+      params
+    });
     return res.data;
   } catch (error) {
     handleAxiosError(error);
   }
+
+  // This should never happen because handleAxiosError always throws an error
+  throw new Error("This should never happen");
 };
 
 export const createNewTopic = async (data: TTopicFormData) => {

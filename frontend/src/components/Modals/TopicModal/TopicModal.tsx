@@ -1,19 +1,19 @@
 import { handleErrorResponse, handleSuccessResponse } from '@/helpers/response';
-import useTopic from '@/hooks/useTopic';
 import { createNewTopic, updateTopic } from '@/services/topic';
-import { TTopicFormData, TTopicType } from '@/types/topic';
+import { TReviewTopicType, TTopicFormData, TTopicType } from '@/types/topic';
 import { Modal, Form, Input } from 'antd';
 import { useEffect, useState } from 'react';
 
 type TTopicModal = {
   visible: boolean;
+  type: TReviewTopicType;
   onCancel: () => void;
   editData: TTopicType;
+  onFetchData?: () => void;
 };
 
-const TopicModal: React.FC<TTopicModal> = ({ visible, onCancel, editData }) => {
+const TopicModal: React.FC<TTopicModal> = ({ type, visible, onCancel, editData, onFetchData }) => {
   const [form] = Form.useForm();
-  const { getAllTopics } =  useTopic();
   const [loading, setLoading] = useState(false);
   const isEdit = !!editData._id;
 
@@ -31,12 +31,13 @@ const TopicModal: React.FC<TTopicModal> = ({ visible, onCancel, editData }) => {
 
     const payload = {
       name: values.name.trim(),
+      type
     };
 
     setLoading(true);
     try {
       isEdit ? await updateTopic(editData._id, payload) : await createNewTopic(payload);
-      getAllTopics();
+      onFetchData?.();
       handleSuccessResponse(`Topic ${isEdit ? 'updated' : 'created'} successfully`);
       handleCancel();
     } catch (error) {
