@@ -4,6 +4,7 @@ const LessonRoutes = require("./lesson.routes");
 const WordRoutes = require("./word.routes");
 const PeriodRoutes = require("./period.routes");
 const TopicRoutes = require("./topic.routes");
+const MusicRoutes = require("./music.routes");
 const UploadRoutes = require("./uploadImage.routes");
 const UtilsRoutes = require("./utils.routes");
 
@@ -14,6 +15,7 @@ const routes = (app) => {
     app.use("/api/words", WordRoutes);
     app.use("/api/periods", PeriodRoutes);
     app.use("/api/topics", TopicRoutes);
+    app.use("/api/musics", MusicRoutes);
     app.use("/api", UploadRoutes);
     app.use("/api", UtilsRoutes);
 };
