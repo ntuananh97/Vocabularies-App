@@ -1,13 +1,14 @@
 const { validateRequiredInput } = require("../utils");
-const MusicService = require("../services/MusicService");
+const PlaylistService = require("../services/PlaylistService");
 
 const { returnInternalErrorResponse, returnInvalidErrorResponse } = require("../utils/returnResponse");
 
-const createMusic = async (req, res) => {
+const createPlaylist = async (req, res) => {
   // validate
   try {
-    const requiredFields = validateRequiredInput(req.body, [
-      "title",
+    const creatingData = {...req.body};
+    const requiredFields = validateRequiredInput(creatingData, [
+      "name",
     ]);
 
     if (requiredFields.length > 0) {
@@ -17,7 +18,7 @@ const createMusic = async (req, res) => {
     }
     const userId = req.user._id;
 
-    const response = await MusicService.create(req.body, userId);
+    const response = await PlaylistService.create(creatingData, userId);
     const { data, status, typeError, message, statusMessage } = response;
 
     return res.status(status).json({
@@ -31,9 +32,9 @@ const createMusic = async (req, res) => {
   }
 };
 
-const getMusics = async (req, res) => {
+const getPlaylists = async (req, res) => {
   try {
-    const response = await MusicService.getList(req, res);
+    const response = await PlaylistService.getList(req, res);
     const { data, status,  message } = response;
     
  
@@ -42,24 +43,32 @@ const getMusics = async (req, res) => {
       message,
     });
   } catch (error) {
-    console.log("get Music ~ error:", error.message)
+    console.log("get Playlist ~ error:", error.message)
     return returnInternalErrorResponse(res, {error: error.message});
   }
 };
 
-const updateMusic = async (req, res) => {
+const updatePlaylist = async (req, res) => {
   try {
-    const updateId = req.params.id;
+    const { id: updateId } = req.params;
+    const { name } = req.body;
+    const updatedData = { ...req.body };
+
     const userId = req.user._id;
+    const hasNameValue = name !== undefined;
 
     // Validate empty name
-    if (req.body.title && !req.body.title.trim()) {
+    if (hasNameValue && !name.trim()) {
       return returnInvalidErrorResponse(res, {
-        message: "The field [title] must not be empty",
+        message: "The field [name] must not be empty",
       });
     }
 
-    const response = await MusicService.update(req.body, updateId, userId);
+    if (hasNameValue) {
+      updatedData.name = name.trim();
+    }
+
+    const response = await PlaylistService.update(updatedData, updateId, userId);
     const { data, status, typeError, message, statusMessage } = response;
 
     return res.status(status).json({
@@ -73,11 +82,11 @@ const updateMusic = async (req, res) => {
   }
 };
 
-const getOneMusic = async (req, res) => {
+const getOnePlaylist = async (req, res) => {
   try {
     const musicId = req.params.id;
 
-    const response = await MusicService.getOne(musicId);
+    const response = await PlaylistService.getOne(musicId);
     const { data, status, typeError, message, statusMessage } = response;
 
     return res.status(status).json({
@@ -91,11 +100,11 @@ const getOneMusic = async (req, res) => {
   }
 };
 
-const deleteMusic = async (req, res) => {
+const deletePlaylist = async (req, res) => {
   try {
     const deleteId = req.params.id;
 
-    const response = await MusicService.deleteDocument(deleteId);
+    const response = await PlaylistService.deleteDocument(deleteId);
     const { data, status, typeError, message, statusMessage } = response;
 
     return res.status(status).json({
@@ -109,20 +118,21 @@ const deleteMusic = async (req, res) => {
   }
 };
 
-const addMusicToTopic = async (req, res) => {
+
+const addPlaylistToTopic = async (req, res) => {
   // validate
   try {
-    const { topicId, musicId } = req.params;
+    const { topicId, playlistId } = req.params;
 
-    if (!topicId || !musicId) {
+    if (!topicId || !playlistId) {
       return returnInvalidErrorResponse(res, {
-        message: `The field topicId and musicId are required`,
+        message: `The field topicId and playlistId are required`,
       });
     }
 
-    const response = await MusicService.addMusicToTopic({
+    const response = await PlaylistService.addPlaylistToTopic({
       topicId,
-      musicId
+      playlistId
     });
     const { data, status, typeError, message, statusMessage } = response;
 
@@ -137,20 +147,20 @@ const addMusicToTopic = async (req, res) => {
   }
 };
 
-const removeMusicFromTopic = async (req, res) => {
+const removePlaylistFromTopic = async (req, res) => {
   // validate
   try {
-    const { topicId, musicId } = req.params;
+    const { topicId, playlistId } = req.params;
 
-    if (!topicId || !musicId) {
+    if (!topicId || !playlistId) {
       return returnInvalidErrorResponse(res, {
-        message: `The field topicId and musicId are required`,
+        message: `The field topicId and playlistId are required`,
       });
     }
 
-    const response = await MusicService.removeMusicFromTopic({
+    const response = await PlaylistService.removeMusicFromTopic({
       topicId,
-      musicId
+      playlistId
     });
     const { data, status, typeError, message, statusMessage } = response;
 
@@ -164,14 +174,13 @@ const removeMusicFromTopic = async (req, res) => {
     return returnInternalErrorResponse(res, {error: error.message});
   }
 };
-
 
 module.exports = {
-  createMusic,
-  getMusics,
-  updateMusic,
-  getOneMusic,
-  deleteMusic,
-  addMusicToTopic,
-  removeMusicFromTopic
+  createPlaylist,
+  getPlaylists,
+  updatePlaylist,
+  getOnePlaylist,
+  deletePlaylist,
+  addPlaylistToTopic,
+  removePlaylistFromTopic
 };

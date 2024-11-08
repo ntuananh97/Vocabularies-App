@@ -1,6 +1,6 @@
 /* eslint-disable no-async-promise-executor */
 const { CONFIG_MESSAGE_ERRORS } = require("../configs/constants");
-const Music = require("../models/music.model");
+const Playlist = require("../models/playlist.model");
 const Topic = require("../models/topic.model");
 const { calcPagination, getAttributesForQuery } = require("../utils/query");
 
@@ -8,29 +8,29 @@ const create = (newData, userId) => {
   return new Promise(async (resolve, reject) => {
 
     try {
-      const { title, lyric, files, topics } = newData;
-      const trimTitle = title.trim();
+      const { name, description, musics, topics } = newData;
+      const trimName = name.trim();
 
       const newDatas = {
-        title: trimTitle,
+        name: trimName,
         userId,
-        lyric,
-        files,
+        description: description?.trim() || "",
+        musics,
         topics
       };
 
-      const checkExistedMusicTitle = await Music.findOne({ title: trimTitle , userId });
-      if (checkExistedMusicTitle) {
+      const checkExistedPlaylistTitle = await Playlist.findOne({ name: trimName , userId });
+      if (checkExistedPlaylistTitle) {
         return resolve({
           status: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.status,
-          message: "The music is existed",
+          message: "The name of playlist is existed",
           typeError: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.type,
           data: null,
           statusMessage: "Error",
         });
       }
 
-      const createdData = await Music.create(newDatas);
+      const createdData = await Playlist.create(newDatas);
 
       if (createdData) {
         return resolve({
@@ -70,8 +70,8 @@ const getList = (req) => {
       musicFacet.push({ $skip: skip }, { $limit: calcLimit });
 
       // Query
-      if (query.title) {
-        query.title = { $regex: query.title?.trim() || "", $options: "i" };
+      if (query.name) {
+        query.name = { $regex: query.name?.trim() || "", $options: "i" };
       }
 
         // Get attributes
@@ -84,7 +84,7 @@ const getList = (req) => {
         { $match: query },
       ]
 
-      const result = await Music.aggregate([
+      const result = await Playlist.aggregate([
         ...topicQuery,
         {
           $facet: {
@@ -114,12 +114,11 @@ const getList = (req) => {
   });
 };
 
-const getOne = (musicId) => {
+const getOne = (playlistId) => {
   return new Promise(async (resolve, reject) => {
     try {
       
-      // Get all data
-      const data = await Music.findById(musicId);
+      const data = await Playlist.findById(playlistId);
 
       return resolve({
         status: CONFIG_MESSAGE_ERRORS.GET_SUCCESS.status,
@@ -137,12 +136,13 @@ const getOne = (musicId) => {
 const update =  (updatedData = {}, updateId, userId) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const checkMusic = await Music.findById(updateId);
+      const checkPlaylist = await Playlist.findById(updateId);
+      const { name } = updatedData;
 
-      if (!checkMusic) {
+      if (!checkPlaylist) {
         resolve({
           status: CONFIG_MESSAGE_ERRORS.INVALID.status,
-          message: "The music is not existed",
+          message: "The playlist is not existed",
           typeError: CONFIG_MESSAGE_ERRORS.INVALID.type,
           data: null,
           statusMessage: "Error",
@@ -150,18 +150,17 @@ const update =  (updatedData = {}, updateId, userId) => {
         return;
       }
 
-      if (updatedData.title) {
-        const trimedTitle = updatedData.title.trim();
-        const checkExistedMusicTitle = await Music.findOne({
-          title: trimedTitle,
+      if (name) {
+        const checkExistedPlaylistName = await Playlist.findOne({
+          name,
           userId,
           _id: { $ne: updateId },
         }); // Loại trừ bản ghi hiện tại
 
-        if (checkExistedMusicTitle) {
+        if (checkExistedPlaylistName) {
           return resolve({
             status: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.status,
-            message: "The title of music is existed",
+            message: "The name of playlist is existed",
             typeError: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.type,
             data: null,
             statusMessage: "Error",
@@ -170,15 +169,15 @@ const update =  (updatedData = {}, updateId, userId) => {
       }
 
       // Modify fields
-      Object.assign(checkMusic, updatedData);
+      Object.assign(checkPlaylist, updatedData);
       // Save the updated document
-      await checkMusic.save();
+      await checkPlaylist.save();
 
       return resolve({
         status: CONFIG_MESSAGE_ERRORS.ACTION_SUCCESS.status,
         message: "updated successfully",
         typeError: "",
-        data: checkMusic,
+        data: checkPlaylist,
         statusMessage: "Success",
       });
     } catch (error) {
@@ -191,7 +190,7 @@ const deleteDocument = (deleteId) => {
   return new Promise(async (resolve, reject) => {
     try {
       
-      const data = await Music.findByIdAndDelete(deleteId);
+      const data = await Playlist.findByIdAndDelete(deleteId);
 
       return resolve({
         status: CONFIG_MESSAGE_ERRORS.GET_SUCCESS.status,
@@ -206,8 +205,66 @@ const deleteDocument = (deleteId) => {
   });
 };
 
+const addPlaylistToTopic = ({
+  topicId, playlistId
+}) => {
+  return new Promise(async (resolve, reject) => {
+
+    try {
+      const topic = await Topic.findById(topicId);
+      if (!topic) {
+        return resolve({
+          status: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.status,
+          message: "Topic is not existed",
+          typeError: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.type,
+          data: null,
+          statusMessage: "Error",
+        });
+      }
+
+      const playlist = await Playlist.findById(playlistId);
+      if (!playlist) {
+        return resolve({
+          status: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.status,
+          message: "Playlist is not existed",
+          typeError: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.type,
+          data: null,
+          statusMessage: "Error",
+        });
+      }
+
+      const isPlaylistInTopic = playlist.topics.includes(topicId);
+
+      // if playlist is not in topic, add it
+      if (!isPlaylistInTopic) {
+        playlist.topics.push(topicId);
+        await playlist.save();
+
+        return resolve({
+          status: CONFIG_MESSAGE_ERRORS.ACTION_SUCCESS.status,
+          message: "added playlist to topic successfully",
+          typeError: "",
+          data: playlist,
+          statusMessage: "Success",
+        });
+      }
+
+      return resolve({
+        status: CONFIG_MESSAGE_ERRORS.ACTION_SUCCESS.status,
+        message: "Playlist is already in topic",
+        typeError: "",
+        data: playlist,
+        statusMessage: "Success",
+      });
+     
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 const removeMusicFromTopic = ({
-  topicId, musicId
+  topicId, playlistId
 }) => {
   return new Promise(async (resolve, reject) => {
 
@@ -224,16 +281,16 @@ const removeMusicFromTopic = ({
         });
       }
 
-      const updatedMusic = await Music.findByIdAndUpdate(
-        musicId,
+      const updatedPlaylist = await Playlist.findByIdAndUpdate(
+        playlistId,
         { $pull: { topics: topicId } },
         { new: true } // Trả về tài liệu đã được cập nhật
       );
 
-      if (!updatedMusic) {
+      if (!updatedPlaylist) {
         return resolve({
           status: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.status,
-          message: "Music is not existed",
+          message: "Playlist is not existed",
           typeError: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.type,
           data: null,
           statusMessage: "Error",
@@ -242,67 +299,9 @@ const removeMusicFromTopic = ({
 
       return resolve({
         status: CONFIG_MESSAGE_ERRORS.ACTION_SUCCESS.status,
-        message: "Remove music from topic successfully",
+        message: "Remove playlist from topic successfully",
         typeError: "",
-        data: updatedMusic,
-        statusMessage: "Success",
-      });
-     
-    } catch (error) {
-      reject(error);
-    }
-  });
-};
-
-const addMusicToTopic = ({
-  topicId, musicId
-}) => {
-  return new Promise(async (resolve, reject) => {
-
-    try {
-      const topic = await Topic.findById(topicId);
-      if (!topic) {
-        return resolve({
-          status: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.status,
-          message: "Topic is not existed",
-          typeError: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.type,
-          data: null,
-          statusMessage: "Error",
-        });
-      }
-
-      const music = await Music.findById(musicId);
-      if (!music) {
-        return resolve({
-          status: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.status,
-          message: "Music is not existed",
-          typeError: CONFIG_MESSAGE_ERRORS.ALREADY_EXIST.type,
-          data: null,
-          statusMessage: "Error",
-        });
-      }
-
-      const isMusicInTopic = music.topics.includes(topicId);
-
-      // if music is not in topic, add it
-      if (!isMusicInTopic) {
-        music.topics.push(topicId);
-        await music.save();
-
-        return resolve({
-          status: CONFIG_MESSAGE_ERRORS.ACTION_SUCCESS.status,
-          message: "added music to topic successfully",
-          typeError: "",
-          data: music,
-          statusMessage: "Success",
-        });
-      }
-
-      return resolve({
-        status: CONFIG_MESSAGE_ERRORS.ACTION_SUCCESS.status,
-        message: "Music is already in topic",
-        typeError: "",
-        data: music,
+        data: updatedPlaylist,
         statusMessage: "Success",
       });
      
@@ -318,6 +317,6 @@ module.exports = {
   update,
   getOne,
   deleteDocument,
-  addMusicToTopic,
+  addPlaylistToTopic,
   removeMusicFromTopic
 };

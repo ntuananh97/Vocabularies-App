@@ -5,8 +5,11 @@ const musicControllers = require('../controllers/music.controller');
 const protectRoute = require("../middleware/protectRoute");
 
 router.post("/", protectRoute, musicControllers.createMusic);
-// router.get("/", protectRoute, musicControllers.getMusics);
-// router.get("/:id", protectRoute, musicControllers.getOneMusic);
-// router.put("/:id", protectRoute, musicControllers.updateMusic);
+router.post("/addToTopic/:topicId/musics/:musicId", protectRoute, musicControllers.addMusicToTopic);
+router.get("/", protectRoute, musicControllers.getMusics);
+router.get("/:id", protectRoute, musicControllers.getOneMusic);
+router.put("/:id", protectRoute, musicControllers.updateMusic);
+router.delete("/:id", protectRoute, musicControllers.deleteMusic);
+router.delete("/removeFromTopic/:topicId/musics/:musicId", protectRoute, musicControllers.removeMusicFromTopic);
 
 module.exports = router;
